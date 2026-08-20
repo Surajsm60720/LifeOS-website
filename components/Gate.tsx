@@ -7,19 +7,13 @@ import { gateScrawl, gateHeading, gateBody, gateFlipLabel, gateSourceLabel, repo
 type GateProps = {
   coverOpen: boolean;
   flipped: boolean;
-  revealed: boolean;
   anchorElRef: RefObject<HTMLDivElement | null>;
   onFlipClick: () => void;
 };
 
-export function Gate({ coverOpen, flipped, revealed, anchorElRef, onFlipClick }: GateProps) {
-  // `revealed` is the authoritative override: main content being visible
-  // (whether reached by clicking flip, or by the hero's skip-intro link,
-  // whose scrollIntoView can itself cross the pad's open threshold and
-  // set coverOpen without ever dispatching FLIP) always means the gate
-  // is done, regardless of how the pad's own scroll-driven state reads.
-  const isShown = coverOpen && !flipped && !revealed;
-  const stateClass = flipped || revealed ? styles.gone : coverOpen ? styles.on : "";
+export function Gate({ coverOpen, flipped, anchorElRef, onFlipClick }: GateProps) {
+  const isShown = coverOpen && !flipped;
+  const stateClass = flipped ? styles.gone : coverOpen ? styles.on : "";
   return (
     <div ref={anchorElRef} className={`${styles.gate} ${stateClass}`} aria-hidden={!isShown}>
       <div className={styles.page}>

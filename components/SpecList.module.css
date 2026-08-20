@@ -23,7 +23,7 @@
 .row dd { color: var(--accent); font-size: .93rem; }
 .row code {
   font-family: var(--mono);
-  background: rgba(255, 255, 255, .06);
+  background: var(--code-bg);
   padding: .1rem .35rem;
   border-radius: 4px;
 }

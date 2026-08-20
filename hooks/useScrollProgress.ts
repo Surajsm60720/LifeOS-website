@@ -10,8 +10,27 @@ import {
 } from "@/lib/scroll-math";
 import { SCROLL_DAMPING } from "@/lib/constants";
 
-export function useScrollProgress(): { progress: number; easedProgress: number; narrow: boolean } {
+type ScrollProgressResult = {
+  /** Damped, for smooth visual interpolation of the 3D pad only. */
+  progress: number;
+  easedProgress: number;
+  /**
+   * Instantaneous, undamped scroll progress — reflects the real current
+   * scroll position immediately, with no lag. The open/close state
+   * machine (lib/pad-state.ts) must key off this, not the damped
+   * `progress`: a programmatic scrollIntoView (from flip()/skipToRevealed())
+   * jumps scrollY immediately, but the damped value only catches up over
+   * several frames — using it for state decisions would read that
+   * catch-up lag as "the user scrolled back" and incorrectly close a pad
+   * that was just explicitly opened.
+   */
+  rawProgress: number;
+  narrow: boolean;
+};
+
+export function useScrollProgress(): ScrollProgressResult {
   const [progress, setProgress] = useState(0);
+  const [rawProgress, setRawProgress] = useState(0);
   const [narrow, setNarrow] = useState(false);
 
   const targetRef = useRef(0);
@@ -24,6 +43,7 @@ export function useScrollProgress(): { progress: number; easedProgress: number; 
       setNarrow(isNarrow);
       const runway = computeRunwayHeightPx(window.innerHeight, isNarrow);
       targetRef.current = computeScrollProgress(window.scrollY, runway);
+      setRawProgress(targetRef.current);
     }
 
     recomputeTarget();
@@ -44,5 +64,5 @@ export function useScrollProgress(): { progress: number; easedProgress: number; 
     };
   }, []);
 
-  return { progress, easedProgress: ease(progress), narrow };
+  return { progress, easedProgress: ease(progress), rawProgress, narrow };
 }

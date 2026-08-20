@@ -3,15 +3,13 @@
 import styles from "./Hero.module.css";
 import { heroEyebrow, heroLede, heroChips, scrollCueText } from "@/lib/content";
 import { useReveal } from "./RevealProvider";
-import { focusFeatures } from "@/lib/focus-features";
 
 export function Hero() {
-  const { reveal } = useReveal();
+  const { skipToRevealed } = useReveal();
 
   function handleSkip(e: React.MouseEvent<HTMLAnchorElement>) {
     e.preventDefault();
-    reveal();
-    focusFeatures("auto");
+    skipToRevealed();
   }
 
   return (

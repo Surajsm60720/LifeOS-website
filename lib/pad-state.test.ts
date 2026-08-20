@@ -37,11 +37,19 @@ describe("padStateReducer", () => {
     expect(flipped.coverOpen).toBe(true);
   });
 
-  it("once flipped, further SCROLL_PROGRESS actions never reopen or close the gate", () => {
+  it("FLIP does nothing if the cover isn't open yet", () => {
+    const next = padStateReducer(initialPadState, { type: "FLIP" });
+    expect(next).toEqual(initialPadState);
+  });
+
+  it("scrolling back after flip resets everything to closed — the closing animation", () => {
     const open = padStateReducer(initialPadState, { type: "SCROLL_PROGRESS", progress: 0.9 });
     const flipped = padStateReducer(open, { type: "FLIP" });
-    const afterScrollUp = padStateReducer(flipped, { type: "SCROLL_PROGRESS", progress: 0.1 });
-    expect(afterScrollUp).toEqual(flipped);
+    const withOpenPages = padStateReducer(flipped, { type: "SET_PAGE_TARGET", index: 0, value: -3 });
+    const afterScrollUp = padStateReducer(withOpenPages, { type: "SCROLL_PROGRESS", progress: 0.5 });
+    expect(afterScrollUp.coverOpen).toBe(false);
+    expect(afterScrollUp.flipped).toBe(false);
+    expect(afterScrollUp.pageTargets).toEqual([0, 0, 0, 0]);
   });
 
   it("SET_PAGE_TARGET updates only the targeted page index", () => {

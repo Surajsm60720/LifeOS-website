@@ -30,4 +30,6 @@
 
   --gut: clamp(20px, 5vw, 64px);
   --max: 1180px;
+
+  --code-bg: rgba(255, 255, 255, .06);
 }

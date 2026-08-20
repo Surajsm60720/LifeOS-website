@@ -21,6 +21,15 @@ test.describe("LifeOS site", () => {
     expect(focusedText).toBe("Everything is an entry.");
   });
 
+  test("scrolling back closes the pad again — reversible, not one-way", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: /skip intro/i }).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("main")).toHaveCSS("opacity", "1");
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await expect(page.locator("main")).toHaveCSS("opacity", "0");
+  });
+
   test("no accessibility violations after reveal", async ({ page }) => {
     await page.goto("/");
     // The skip link is intentionally off-screen until keyboard-focused

@@ -48,4 +48,19 @@ describe("useScrollProgress", () => {
     const { result } = renderHook(() => useScrollProgress());
     expect(result.current.narrow).toBe(true);
   });
+
+  it("rawProgress reflects a scroll jump immediately, with no damping lag", () => {
+    const { result } = renderHook(() => useScrollProgress());
+    Object.defineProperty(window, "scrollY", { value: 1900, writable: true });
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+    // No frames flushed — the damped `progress` hasn't moved at all yet,
+    // but rawProgress must already read the true value. This is the
+    // property a programmatic scrollIntoView (flip()/skipToRevealed())
+    // depends on: the pad-state machine reads rawProgress specifically
+    // so a big jump can't look like "scrolled back" while damping catches up.
+    expect(result.current.rawProgress).toBeCloseTo(1, 5);
+    expect(result.current.progress).toBe(0);
+  });
 });
