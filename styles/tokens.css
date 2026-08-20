@@ -1,0 +1,33 @@
+:root {
+  /* Pulled verbatim from LifeOS/Utilities/LifeOSTheme.swift */
+  --canvas: #0F0F12;
+  --void: #06060D;
+  --elevated: #1C1C1F;
+  --stroke: rgba(255, 255, 255, .07);
+  --stroke-2: rgba(255, 255, 255, .12);
+  --soft: #9EA1A6;
+  --accent: #C7CCD6;
+  --irl: #8C9EB3;
+  --game: #9E9994;
+  --ent: #9494A3;
+
+  /* GameIdentity.swift */
+  --gi: #94A3AD;
+  --hsr: #9999AD;
+  --wuwa: #8CA8A3;
+
+  /* sampled from AppIcon-Dark.png — signature accents only, see spec §2.3 */
+  --coral: #F0876E;
+  --cream: #FEF3E0;
+  --gold: #F0D8A8;
+  --violet: #A08CDC;
+  --mint: #8CC8B4;
+  --ink: #3E52B5;
+
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --hand: var(--font-hand), cursive;
+
+  --gut: clamp(20px, 5vw, 64px);
+  --max: 1180px;
+}
