@@ -14,7 +14,7 @@ import { PAGE_FLIP_STAGGER_MS, PAGE_COUNT } from "@/lib/constants";
 export function ExperienceStage() {
   const { progress, easedProgress, narrow } = useScrollProgress();
   const reduced = useReducedMotion();
-  const { reveal } = useReveal();
+  const { reveal, revealed } = useReveal();
   const [padState, dispatch] = useReducer(padStateReducer, initialPadState);
 
   const gateAnchorElRef = useRef<HTMLDivElement>(null);
@@ -50,6 +50,7 @@ export function ExperienceStage() {
         easedProgress={easedProgress}
         narrow={narrow}
         reduced={reduced}
+        revealed={revealed}
         pageTargetsRef={pageTargetsRef}
         coverTargetRef={coverTargetRef}
         gateAnchorElRef={gateAnchorElRef}
@@ -57,6 +58,7 @@ export function ExperienceStage() {
       <Gate
         coverOpen={padState.coverOpen}
         flipped={padState.flipped}
+        revealed={revealed}
         anchorElRef={gateAnchorElRef}
         onFlipClick={handleFlipClick}
       />

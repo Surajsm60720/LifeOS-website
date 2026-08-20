@@ -12,6 +12,7 @@ type SceneProps = {
   easedProgress: number;
   narrow: boolean;
   reduced: boolean;
+  revealed: boolean;
   pageTargetsRef: React.RefObject<number[]>;
   coverTargetRef: React.RefObject<number>;
   gateAnchorElRef: React.RefObject<HTMLDivElement | null>;
@@ -66,13 +67,21 @@ export function Scene(props: SceneProps) {
     // elsewhere on the page, so this is hidden from assistive tech rather
     // than left as an unlabeled landmark-less image.
     // eslint-disable-next-line @next/next/no-img-element -- static fallback, no need for next/image's runtime optimization here
-    return <img className={styles.fallback} src="/icon-source.png" alt="" aria-hidden="true" />;
+    return props.revealed ? null : <img className={styles.fallback} src="/icon-source.png" alt="" aria-hidden="true" />;
   }
 
+  // Once the pages have been flipped and content revealed, the pad stays
+  // frozen open (lib/pad-state.ts never re-closes it after FLIP). Left
+  // alone that reads as broken — a book stuck half-open forever when you
+  // scroll back up. Fade the whole stage out instead, same transition
+  // used for the initial fade-in, so scrolling back to the hero shows a
+  // clean view rather than a stranded open pad.
+  const isShowing = ready && !props.revealed;
+
   return (
-    <div ref={wrapperRef} className={`${styles.stage} ${ready ? styles.ready : ""}`} aria-hidden="true">
+    <div ref={wrapperRef} className={`${styles.stage} ${isShowing ? styles.ready : ""}`} aria-hidden="true">
       <Canvas
-        frameloop={active ? "always" : "never"}
+        frameloop={active && !props.revealed ? "always" : "never"}
         dpr={getDprCap()}
         camera={{ fov: 40, near: 0.1, far: 100, position: [0, 0, 9] }}
         gl={{ antialias: true, alpha: true }}
