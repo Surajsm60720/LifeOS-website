@@ -62,12 +62,15 @@ export function Scene(props: SceneProps) {
   }, []);
 
   if (!webglOk) {
+    // Purely decorative — every piece of real content also exists as text
+    // elsewhere on the page, so this is hidden from assistive tech rather
+    // than left as an unlabeled landmark-less image.
     // eslint-disable-next-line @next/next/no-img-element -- static fallback, no need for next/image's runtime optimization here
-    return <img className={styles.fallback} src="/icon-source.png" alt="LifeOS app icon" />;
+    return <img className={styles.fallback} src="/icon-source.png" alt="" aria-hidden="true" />;
   }
 
   return (
-    <div ref={wrapperRef} className={`${styles.stage} ${ready ? styles.ready : ""}`}>
+    <div ref={wrapperRef} className={`${styles.stage} ${ready ? styles.ready : ""}`} aria-hidden="true">
       <Canvas
         frameloop={active ? "always" : "never"}
         dpr={getDprCap()}
