@@ -1,0 +1,68 @@
+.gate {
+  position: fixed;
+  z-index: 3;
+  left: var(--gate-x, 50%);
+  top: var(--gate-y, 42%);
+  transform: translate(-50%, -50%) scale(.94);
+  width: min(90vw, 372px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .55s ease, transform .55s cubic-bezier(.2, .8, .25, 1), visibility .55s;
+}
+.gate.on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.gate.gone {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, -66%) scale(.96);
+}
+.page {
+  background: linear-gradient(175deg, var(--cream), #F2E4CC);
+  border-radius: 10px;
+  padding: 1.9rem 1.6rem 1.6rem;
+  color: #2A2622;
+  box-shadow: 0 30px 70px -22px rgba(0, 0, 0, .85), 0 1px 0 rgba(255, 255, 255, .5) inset;
+  position: relative;
+}
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 3.2rem .9rem 3.4rem;
+  pointer-events: none;
+  opacity: .5;
+  background: repeating-linear-gradient(transparent 0 25px, rgba(62, 82, 181, .16) 25px 26px);
+}
+.page h2 { font-size: 1.28rem; color: #241F1A; letter-spacing: -.02em; line-height: 1.25; position: relative; }
+.page p { color: #6A6055; font-size: .87rem; margin-top: .5rem; position: relative; }
+.scrawl {
+  font-family: var(--hand);
+  font-size: 1.24rem;
+  color: var(--ink);
+  transform: rotate(-2.4deg);
+  display: inline-block;
+  margin-bottom: .15rem;
+}
+.actions { display: flex; flex-direction: column; gap: .55rem; margin-top: 1.5rem; position: relative; }
+.btn {
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 560;
+  cursor: pointer;
+  border: 0;
+  padding: .78rem 1.1rem;
+  border-radius: 9px;
+  text-align: center;
+  text-decoration: none;
+  transition: transform .18s ease, filter .18s ease;
+  display: block;
+}
+.btn:hover { transform: translateY(-1px); filter: brightness(1.07); }
+.btn:active { transform: translateY(0); }
+.primary { background: #241F1A; color: var(--cream); }
+.ghost { background: transparent; color: #5A5148; border: 1px solid rgba(42, 38, 34, .24); }
