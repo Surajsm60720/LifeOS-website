@@ -17,6 +17,7 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "LifeOS — a calendar for your whole life, on your device",
   description:
     "LifeOS is a local-first iOS calendar for day-to-day plans, gacha-game cadence, and reading progress. No accounts, no sync, no trackers.",
