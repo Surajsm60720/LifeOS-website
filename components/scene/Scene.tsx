@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import styles from "./Scene.module.css";
 import { Lights } from "./Lights";
 import { Motes } from "./Motes";
@@ -93,15 +93,27 @@ export function Scene(props: SceneProps) {
       >
         <Lights />
         <Motes />
-        <Pad
-          easedProgress={props.easedProgress}
-          narrow={props.narrow}
-          reduced={props.reduced}
-          pageTargetsRef={props.pageTargetsRef}
-          coverTargetRef={props.coverTargetRef}
-          onCoverLoaded={() => setReady(true)}
-          gateAnchorElRef={props.gateAnchorElRef}
-        />
+        {/*
+          Cover.tsx calls useTexture(), which suspends the tree while the
+          icon PNG loads. R3F's Canvas does not add a Suspense boundary
+          on its own — without one here, the first render attempt throws
+          the loading promise with nothing to catch it, that render pass
+          is silently dropped, and nothing re-renders the pad until some
+          unrelated state change (scroll, HMR, a reload) happens to
+          trigger another attempt after the texture's already cached.
+          That's the "only shows up after a reload" bug.
+        */}
+        <Suspense fallback={null}>
+          <Pad
+            easedProgress={props.easedProgress}
+            narrow={props.narrow}
+            reduced={props.reduced}
+            pageTargetsRef={props.pageTargetsRef}
+            coverTargetRef={props.coverTargetRef}
+            onCoverLoaded={() => setReady(true)}
+            gateAnchorElRef={props.gateAnchorElRef}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );
