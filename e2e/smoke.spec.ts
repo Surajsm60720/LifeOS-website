@@ -30,6 +30,11 @@ test.describe("LifeOS site", () => {
     await page.getByRole("link", { name: /skip intro/i }).focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("heading", { name: "Everything is an entry." })).toBeVisible();
+    // The reveal fades `main` in over .8s — wait for that transition to
+    // finish before scanning, otherwise axe measures text against the
+    // still-transparent ancestor's opacity and reports false contrast
+    // violations mid-fade.
+    await expect(page.locator("main")).toHaveCSS("opacity", "1");
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
