@@ -1,0 +1,9 @@
+.runway {
+  height: 190svh;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+@media (max-width: 880px) {
+  .runway { height: 150svh; }
+}

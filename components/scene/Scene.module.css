@@ -1,0 +1,23 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .9s ease .25s;
+}
+.stage.ready { opacity: 1; }
+
+.fallback {
+  position: fixed;
+  z-index: 1;
+  top: 50%;
+  right: 8vw;
+  transform: translateY(-50%);
+  width: min(38vw, 330px);
+  border-radius: 26%;
+  box-shadow: 0 40px 90px -30px rgba(0, 0, 0, .9), 0 0 0 1px var(--stroke);
+}
+@media (max-width: 880px) {
+  .fallback { right: 50%; transform: translate(50%, -50%); width: 60vw; }
+}
