@@ -4,8 +4,29 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity .8s ease;
+  padding-block: clamp(3rem, 8vw, 6rem);
 }
 .revealed {
   opacity: 1;
   pointer-events: auto;
+}
+
+/*
+ * The bounded "page" the notebook opens into — everything past the flip
+ * lives inside this one card instead of spreading into a full-width
+ * marketing grid, so it keeps reading as the notebook, not a website.
+ */
+.page {
+  position: relative;
+  width: min(760px, calc(100% - 2 * var(--gut)));
+  margin-inline: auto;
+  background: var(--elevated);
+  border: 1px solid var(--stroke);
+  border-radius: 28px;
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .03) inset;
+  padding: clamp(1.6rem, 5vw, 3rem);
+}
+
+@media (max-width: 880px) {
+  .page { border-radius: 18px; }
 }

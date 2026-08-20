@@ -10,7 +10,6 @@ export type FeatureSection = {
   eyebrow: string;
   heading: string;
   lede?: string;
-  columns: 2 | 3;
   cards: FeatureCard[];
 };
 export type SpecSegment = { text: string; code?: boolean };
@@ -44,7 +43,6 @@ export const featureSections: FeatureSection[] = [
     heading: "Everything is an entry.",
     lede:
       "A dinner, a banner window and chapter 402 are the same object with different capabilities switched on — so the calendar, the reminders and the recap never disagree with each other.",
-    columns: 3,
     cards: [
       {
         tag: "IRL",
@@ -69,7 +67,6 @@ export const featureSections: FeatureSection[] = [
   {
     eyebrow: "Time, four ways",
     heading: "Day, week, month, year.",
-    columns: 2,
     cards: [
       {
         tag: "Calendar",
@@ -102,7 +99,6 @@ export const featureSections: FeatureSection[] = [
     heading: "Notifications that know their limits.",
     lede:
       "iOS allows 64 pending local notifications per app. LifeOS treats that as a budget you can see, not a wall you hit silently.",
-    columns: 3,
     cards: [
       {
         tag: "Rules",
@@ -127,7 +123,6 @@ export const featureSections: FeatureSection[] = [
   {
     eyebrow: "Places & money",
     heading: "Where you went, what it cost.",
-    columns: 2,
     cards: [
       {
         tag: "Map-first",
@@ -146,7 +141,6 @@ export const featureSections: FeatureSection[] = [
   {
     eyebrow: "Your data",
     heading: "It stays on the phone.",
-    columns: 3,
     cards: [
       {
         tag: "Backup",

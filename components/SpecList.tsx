@@ -3,7 +3,7 @@ import { specSectionEyebrow, specSectionHeading, specRows } from "@/lib/content"
 
 export function SpecList() {
   return (
-    <section className={`wrap ${styles.section}`}>
+    <section className={styles.section}>
       <div className={styles.head}>
         <p className="eyebrow">{specSectionEyebrow}</p>
         <h2>{specSectionHeading}</h2>

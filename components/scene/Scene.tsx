@@ -85,6 +85,11 @@ export function Scene(props: SceneProps) {
         dpr={getDprCap()}
         camera={{ fov: 40, near: 0.1, far: 100, position: [0, 0, 9] }}
         gl={{ antialias: true, alpha: true }}
+        // v1 (three.js r128) rendered untone-mapped; R3F defaults to
+        // ACESFilmicToneMapping, which further darkens/desaturates on
+        // top of the physically-correct lighting recalibration in
+        // Lights.tsx. Flat mode keeps material colors closer to v1's.
+        flat
       >
         <Lights />
         <Motes />

@@ -4,7 +4,7 @@ import { footerEyebrow, footerBody, footerSmallLines, repoUrl } from "@/lib/cont
 export function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={`wrap ${styles.inner}`}>
+      <div className={styles.inner}>
         <div>
           <p className="eyebrow" style={{ marginBottom: ".9rem" }}>
             {footerEyebrow}

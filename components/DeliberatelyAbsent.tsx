@@ -8,7 +8,7 @@ import {
 
 export function DeliberatelyAbsent() {
   return (
-    <section className={`wrap ${styles.section}`}>
+    <section className={styles.section}>
       <div className={styles.out}>
         <p className="eyebrow">{deliberatelyAbsentEyebrow}</p>
         <h2 className={styles.heading}>{deliberatelyAbsentHeading}</h2>

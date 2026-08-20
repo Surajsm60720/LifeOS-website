@@ -4,19 +4,15 @@ import { MediaSlot } from "./MediaSlot";
 
 export function FeatureSection({ section }: { section: FeatureSectionData }) {
   return (
-    <section
-      className={`wrap ${styles.section}`}
-      id={section.id}
-      tabIndex={section.id ? -1 : undefined}
-    >
+    <section className={styles.section} id={section.id} tabIndex={section.id ? -1 : undefined}>
       <div className={styles.head}>
         <p className="eyebrow">{section.eyebrow}</p>
         <h2>{section.heading}</h2>
         {section.lede && <p>{section.lede}</p>}
       </div>
-      <div className={`${styles.grid} ${section.columns === 3 ? styles.g3 : styles.g2}`}>
+      <div className={styles.list}>
         {section.cards.map((card) => (
-          <div className={styles.cell} key={card.title}>
+          <div className={styles.row} key={card.title}>
             <span className={styles.tag}>
               <i className={styles.dot} style={{ background: `var(${card.dotVar})` }} />
               {card.tag}
