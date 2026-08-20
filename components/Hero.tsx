@@ -26,7 +26,7 @@ export function Hero() {
       </a>
       <div className={`wrap ${styles.grid}`}>
         <div>
-          <p className={styles.eyebrow}>{heroEyebrow}</p>
+          <p className="eyebrow">{heroEyebrow}</p>
           <h1 className={styles.wordmark}>
             Life<em>OS</em>
           </h1>

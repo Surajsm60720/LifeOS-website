@@ -20,6 +20,10 @@ type CoverProps = {
 
 export function Cover({ targetRef, reduced, onLoaded, hingeRef }: CoverProps) {
   const texture = useTexture("/icon-source.png", () => onLoaded());
+  // three.js Texture objects are mutated in place by design (not React
+  // state) — the React Compiler immutability rule doesn't model this;
+  // this is the standard R3F pattern for configuring a loaded texture.
+  // eslint-disable-next-line react-hooks/immutability
   texture.colorSpace = THREE.SRGBColorSpace;
 
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);

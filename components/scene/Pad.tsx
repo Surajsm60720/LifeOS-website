@@ -40,6 +40,11 @@ export function Pad({
 
   usePadAnchor(padRef, gateAnchorElRef);
 
+  // Per-frame imperative transform updates are the standard R3F animation
+  // pattern: `pad`/`camera` are three.js objects mutated outside React's
+  // render cycle by design, not React state. The React Compiler hook
+  // rules don't model this, so they're scoped off for this callback only.
+  /* eslint-disable react-hooks/immutability */
   useFrame(({ clock }) => {
     const pad = padRef.current;
     if (!pad) return;
@@ -60,6 +65,7 @@ export function Pad({
     pointerRef.current.px += (pointerRef.current.tx - pointerRef.current.px) * 0.05;
     pointerRef.current.py += (pointerRef.current.ty - pointerRef.current.py) * 0.05;
   });
+  /* eslint-enable react-hooks/immutability */
 
   return (
     <group

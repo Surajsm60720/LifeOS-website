@@ -28,6 +28,23 @@ body::before {
 
 .wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gut); }
 
+/*
+ * Shared across Hero, FeatureSection, SpecList, DeliberatelyAbsent, and
+ * Footer — v1 used one global .eyebrow class in all of these places, so
+ * this stays global rather than duplicated per CSS Module.
+ */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: .7rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--soft);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--stroke-2); }
+
 h1, h2, h3 { letter-spacing: -.03em; line-height: 1.04; color: #fff; font-weight: 600; }
 h2 { font-size: clamp(1.85rem, 4.4vw, 3rem); letter-spacing: -.035em; }
 h3 { font-size: 1.06rem; letter-spacing: -.015em; font-weight: 590; }

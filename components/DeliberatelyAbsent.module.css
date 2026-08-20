@@ -1,0 +1,18 @@
+.section { padding-block: clamp(4rem, 9vw, 7.5rem); }
+.out {
+  border: 1px dashed var(--stroke-2);
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem;
+  background: rgba(255, 255, 255, .015);
+}
+.heading { font-size: clamp(1.4rem, 3vw, 2rem); margin: .8rem 0 .5rem; }
+.list { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.1rem; padding: 0; }
+.list li {
+  font-family: var(--mono);
+  font-size: .7rem;
+  color: var(--soft);
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  padding: .38rem .72rem;
+}
+.list li::before { content: "— "; opacity: .55; }

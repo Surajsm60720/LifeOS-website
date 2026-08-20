@@ -17,11 +17,17 @@ export function Motes() {
   const geometry = useMemo(() => {
     const count = getMoteCount();
     const positions = new Float32Array(count * 3);
+    // Deliberately random, one-time starfield scatter — memoized so it
+    // only runs once per mount. The React Compiler purity rule flags any
+    // Math.random() reachable from render regardless of memoization;
+    // that's a legitimate false positive for one-shot procedural geometry.
+    /* eslint-disable react-hooks/purity */
     for (let m = 0; m < count; m++) {
       positions[m * 3 + 0] = (Math.random() - 0.5) * 22;
       positions[m * 3 + 1] = (Math.random() - 0.5) * 14;
       positions[m * 3 + 2] = (Math.random() - 0.5) * 10 - 4;
     }
+    /* eslint-enable react-hooks/purity */
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     return geo;

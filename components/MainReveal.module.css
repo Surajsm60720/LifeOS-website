@@ -1,0 +1,11 @@
+.main {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .8s ease;
+}
+.revealed {
+  opacity: 1;
+  pointer-events: auto;
+}

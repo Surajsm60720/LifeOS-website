@@ -37,11 +37,9 @@ export function Scene(props: SceneProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(true);
   const [ready, setReady] = useState(false);
-  const [webglOk, setWebglOk] = useState(true);
-
-  useEffect(() => {
-    setWebglOk(supportsWebGL());
-  }, []);
+  // Lazy initializer runs once per render pass (SSR and client); supportsWebGL()
+  // guards on `typeof window` so this is safe during server rendering.
+  const [webglOk] = useState(() => supportsWebGL());
 
   useEffect(() => {
     const el = wrapperRef.current;
