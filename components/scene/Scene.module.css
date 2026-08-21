@@ -4,7 +4,11 @@
   z-index: 1;
   pointer-events: none;
   opacity: 0;
-  transition: opacity .9s ease .25s;
+  /* No delay — this transition also fires every time the pad reappears
+     after scrolling back out of content, not just on first page load
+     (its original v1 use case). A .25s pre-delay there just reads as a
+     dead gap between the content fading out and the pad fading back in. */
+  transition: opacity .6s ease;
 }
 .stage.ready { opacity: 1; }
 
