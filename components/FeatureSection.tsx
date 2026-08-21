@@ -14,12 +14,14 @@ export function FeatureSection({ section }: { section: FeatureSectionData }) {
       <div className={styles.list}>
         {section.cards.map((card, i) => (
           <Reveal key={card.title} className={styles.row}>
-            <span className={styles.tag}>
-              <i className={styles.dot} style={{ background: `var(${card.dotVar})` }} />
-              {card.tag}
-            </span>
-            <h3>{card.title}</h3>
-            <p>{card.body}</p>
+            <div className={styles.text}>
+              <span className={styles.tag}>
+                <i className={styles.dot} style={{ background: `var(${card.dotVar})` }} />
+                {card.tag}
+              </span>
+              <h3>{card.title}</h3>
+              <p>{card.body}</p>
+            </div>
             <MediaSlot seed={i} />
           </Reveal>
         ))}

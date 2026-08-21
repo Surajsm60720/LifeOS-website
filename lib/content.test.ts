@@ -1,11 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  heroChips,
-  featureSections,
-  specRows,
-  deliberatelyAbsent,
-  contentPages,
-} from "./content";
+import { heroChips, featureSections, contentPages } from "./content";
 
 describe("hero chips", () => {
   it("has exactly 5 chips, matching the v1.0.2 hero", () => {
@@ -41,42 +35,19 @@ describe("feature sections", () => {
   });
 });
 
-describe("spec rows", () => {
-  it("has exactly 7 rows, matching the v1.0.2 'under the hood' table", () => {
-    expect(specRows).toHaveLength(7);
-  });
-});
-
-describe("deliberately absent", () => {
-  it("has exactly 8 items, matching the v1.0.2 list", () => {
-    expect(deliberatelyAbsent).toHaveLength(8);
-  });
-});
-
 describe("content pages", () => {
-  it("has exactly 4 pages, matching the pad's 4 physical pages", () => {
-    expect(contentPages).toHaveLength(4);
+  it("has exactly 3 pages, matching the pad's 4 physical pages minus the removed spec/absent page", () => {
+    expect(contentPages).toHaveLength(3);
   });
 
   it("every featureSections entry appears in exactly one page, in order, with none dropped or duplicated", () => {
-    const referenced = contentPages
-      .flatMap((page) => page.blocks)
-      .filter((block) => block.kind === "feature")
-      .map((block) => block.section);
+    const referenced = contentPages.flatMap((page) => page.sections);
     expect(referenced).toEqual(featureSections);
-  });
-
-  it("has exactly one spec block and one absent block, both on the last page", () => {
-    const allBlocks = contentPages.flatMap((page) => page.blocks);
-    expect(allBlocks.filter((b) => b.kind === "spec")).toHaveLength(1);
-    expect(allBlocks.filter((b) => b.kind === "absent")).toHaveLength(1);
-    const lastPageKinds = contentPages[contentPages.length - 1].blocks.map((b) => b.kind);
-    expect(lastPageKinds).toEqual(["spec", "absent"]);
   });
 
   it("no page is empty", () => {
     for (const page of contentPages) {
-      expect(page.blocks.length).toBeGreaterThan(0);
+      expect(page.sections.length).toBeGreaterThan(0);
       expect(page.label.trim().length).toBeGreaterThan(0);
     }
   });

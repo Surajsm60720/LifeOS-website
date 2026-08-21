@@ -12,9 +12,6 @@ export type FeatureSection = {
   lede?: string;
   cards: FeatureCard[];
 };
-export type SpecSegment = { text: string; code?: boolean };
-export type SpecRow = { term: string; definition: SpecSegment[] };
-
 export const heroEyebrow = "Version 1.0.2 · 17 Aug 2026";
 export const heroLede =
   "A calendar that holds your real life, your game cadence, and everything you're part-way through reading — in one entry model, on one device, with no account behind it.";
@@ -164,81 +161,18 @@ export const featureSections: FeatureSection[] = [
   },
 ];
 
-export const specSectionEyebrow = "Under the hood";
-export const specSectionHeading = "Native, and only native.";
-
-export const specRows: SpecRow[] = [
-  { term: "Language / UI", definition: [{ text: "Swift · SwiftUI, dark theme only" }] },
-  { term: "Persistence", definition: [{ text: "SwiftData, on-device" }] },
-  {
-    term: "Recurrence",
-    definition: [
-      { text: "Custom " },
-      { text: "Calendar", code: true },
-      { text: " / " },
-      { text: "DateComponents", code: true },
-      { text: " engine — deliberately not EventKit, so the app never asks for your system calendar" },
-    ],
-  },
-  { term: "Notifications", definition: [{ text: "UserNotifications, 64-request budget aware" }] },
-  { term: "Live Activities", definition: [{ text: "ActivityKit · WidgetKit extension" }] },
-  { term: "Places", definition: [{ text: "MapKit search and map picker" }] },
-  {
-    term: "Project",
-    definition: [
-      { text: "XcodeGen from " },
-      { text: "project.yml", code: true },
-      { text: " · 75 unit tests" },
-    ],
-  },
-];
-
-export const deliberatelyAbsentEyebrow = "Deliberately absent";
-export const deliberatelyAbsentHeading = "Things it will not do.";
-export const deliberatelyAbsentLede =
-  "Scope kept small on purpose. These aren't roadmap items being hinted at — they're decisions.";
-export const deliberatelyAbsent: string[] = [
-  "CloudKit sync",
-  "Home-screen widgets",
-  "Charts",
-  "Accounts or login",
-  "Third-party trackers",
-  "Unofficial game APIs",
-  "Light theme",
-  "In-app LLM calls",
-];
-
 export const footerEyebrow = "Build it yourself";
 export const footerBody =
   "A personal project, not an App Store release. Clone the repo, open it in Xcode with your own signing team, and run it.";
 export const footerSmallLines = ["LifeOS v1.0.2", "Swift · SwiftUI · SwiftData", "Local-first by design"];
 
-// Groups the sections above into the notebook's 4 physical pages, so the
+// Groups the sections above into the notebook's 3 physical pages, so the
 // content reads as pages of the pad rather than one undifferentiated
-// scroll of cards. `spec`/`absent` reference the singleton content
-// above by kind rather than duplicating it.
-export type PageBlock =
-  | { kind: "feature"; section: FeatureSection }
-  | { kind: "spec" }
-  | { kind: "absent" };
-
-export type ContentPage = { label: string; blocks: PageBlock[] };
+// scroll of cards.
+export type ContentPage = { label: string; sections: FeatureSection[] };
 
 export const contentPages: ContentPage[] = [
-  { label: "01", blocks: [{ kind: "feature", section: featureSections[0] }] },
-  {
-    label: "02",
-    blocks: [
-      { kind: "feature", section: featureSections[1] },
-      { kind: "feature", section: featureSections[2] },
-    ],
-  },
-  {
-    label: "03",
-    blocks: [
-      { kind: "feature", section: featureSections[3] },
-      { kind: "feature", section: featureSections[4] },
-    ],
-  },
-  { label: "04", blocks: [{ kind: "spec" }, { kind: "absent" }] },
+  { label: "01", sections: [featureSections[0]] },
+  { label: "02", sections: [featureSections[1], featureSections[2]] },
+  { label: "03", sections: [featureSections[3], featureSections[4]] },
 ];

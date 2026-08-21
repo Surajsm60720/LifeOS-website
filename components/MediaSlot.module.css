@@ -1,9 +1,8 @@
 .slot {
   position: relative;
-  width: 76%;
-  max-width: 220px;
+  width: clamp(140px, 24vw, 220px);
+  flex: none;
   aspect-ratio: 4 / 3;
-  margin: 1.3rem 0 .4rem;
   background: rgba(255, 255, 255, .02);
   border: 1px solid var(--stroke);
   border-radius: 3px;
@@ -12,6 +11,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 720px) {
+  .slot { width: min(76%, 220px); margin-top: .5rem; }
 }
 
 /* tape holding the photo to the page */

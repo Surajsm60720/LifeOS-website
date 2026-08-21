@@ -5,13 +5,31 @@
 .head p { font-size: .88rem; }
 
 .list { border-top: 1px solid var(--stroke); }
+
+/*
+ * Text and media side by side, alternating left/right per entry —
+ * cuts the amount of vertical scrolling a lot versus stacking media
+ * under every entry's text, and reads less like a repeated list.
+ */
 .row {
-  padding: 1.25rem 0;
+  padding: 1.5rem 0;
   border-bottom: 1px solid var(--stroke);
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+}
+.row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.text {
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: .4rem;
 }
+
 .tag {
   font-family: var(--mono);
   font-size: .63rem;
@@ -23,4 +41,12 @@
   gap: .45rem;
 }
 .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
-.row p { font-size: .875rem; line-height: 1.6; }
+.text p { font-size: .875rem; line-height: 1.6; }
+
+@media (max-width: 720px) {
+  .row,
+  .row:nth-child(even) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
