@@ -12,36 +12,25 @@
 }
 
 /*
- * The bounded "page" the notebook opens into — everything past the flip
- * lives inside this one card, styled as the notebook's own cream paper
- * (same gradient/ruled-line treatment as the gate page) rather than a
- * dark website card, so it reads as content *on* the calendar rather
- * than content that merely sits next to it.
- *
- * Environment tokens are overridden locally to real ink/paper values —
- * every descendant (FeatureSection, SpecList, DeliberatelyAbsent,
- * MediaSlot) already reads --stroke/--soft/--elevated for dividers,
- * muted text, and hover states, so this cascades to all of them without
- * touching their CSS individually. Signature accent tokens (--coral,
- * --irl, --gold, etc.) are untouched — the category dots still read as
- * colored ink on paper, which is exactly right.
+ * The bounded "page" the notebook opens into. Structurally this still
+ * reads as a notebook page — bounded column, rounded card, ring binding
+ * on the edge, ruled-line texture — but the app itself is dark-theme
+ * only with neutral cool-gray accents and no warm punch (verbatim from
+ * LifeOSTheme.swift's own doc comment), so the color identity here
+ * stays dark/gray/white, matching the real app, rather than the cream
+ * paper look (which stays where it belongs: the gate page during the
+ * flip moment, a deliberate one-time signature accent, not the ongoing
+ * reading surface).
  */
 .page {
   position: relative;
   width: min(760px, calc(100% - 2 * var(--gut)));
   margin-inline: auto;
   overflow: hidden;
-
-  --stroke: rgba(42, 38, 34, .12);
-  --stroke-2: rgba(42, 38, 34, .22);
-  --soft: #6A6055;
-  --accent: #241F1A;
-  --elevated: #F2E4CC;
-  --code-bg: rgba(42, 38, 34, .08);
-
-  background: linear-gradient(175deg, var(--cream), #F2E4CC);
+  background: var(--elevated);
+  border: 1px solid var(--stroke);
   border-radius: 28px;
-  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .5) inset;
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .03) inset;
   padding: clamp(1.8rem, 5vw, 3.25rem);
 }
 
@@ -50,14 +39,8 @@
   position: absolute;
   inset: 5rem 1.6rem 2rem;
   pointer-events: none;
-  opacity: .45;
-  background: repeating-linear-gradient(transparent 0 25px, rgba(62, 82, 181, .14) 25px 26px);
-}
-
-.page :global(h1),
-.page :global(h2),
-.page :global(h3) {
-  color: #241F1A;
+  opacity: .5;
+  background: repeating-linear-gradient(transparent 0 25px, rgba(255, 255, 255, .05) 25px 26px);
 }
 
 @media (max-width: 880px) {
