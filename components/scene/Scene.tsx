@@ -12,7 +12,7 @@ type SceneProps = {
   easedProgress: number;
   narrow: boolean;
   reduced: boolean;
-  revealed: boolean;
+  contentVisible: boolean;
   pageTargetsRef: React.RefObject<number[]>;
   coverTargetRef: React.RefObject<number>;
   gateAnchorElRef: React.RefObject<HTMLDivElement | null>;
@@ -67,21 +67,20 @@ export function Scene(props: SceneProps) {
     // elsewhere on the page, so this is hidden from assistive tech rather
     // than left as an unlabeled landmark-less image.
     // eslint-disable-next-line @next/next/no-img-element -- static fallback, no need for next/image's runtime optimization here
-    return props.revealed ? null : <img className={styles.fallback} src="/icon-source.png" alt="" aria-hidden="true" />;
+    return props.contentVisible ? null : <img className={styles.fallback} src="/icon-source.png" alt="" aria-hidden="true" />;
   }
 
-  // Once the pages have been flipped and content revealed, the pad stays
-  // frozen open (lib/pad-state.ts never re-closes it after FLIP). Left
-  // alone that reads as broken — a book stuck half-open forever when you
-  // scroll back up. Fade the whole stage out instead, same transition
-  // used for the initial fade-in, so scrolling back to the hero shows a
-  // clean view rather than a stranded open pad.
-  const isShowing = ready && !props.revealed;
+  // Fades out once the content page has actually crossfaded in (not the
+  // instant `flipped` flag — that would start hiding the pad while the
+  // page-flip animation is still mid-flight) and fades back in the
+  // moment scrolling back closes the pad, so the pad reappears cleanly
+  // rather than staying a stranded open book.
+  const isShowing = ready && !props.contentVisible;
 
   return (
     <div ref={wrapperRef} className={`${styles.stage} ${isShowing ? styles.ready : ""}`} aria-hidden="true">
       <Canvas
-        frameloop={active && !props.revealed ? "always" : "never"}
+        frameloop={active && !props.contentVisible ? "always" : "never"}
         dpr={getDprCap()}
         camera={{ fov: 40, near: 0.1, far: 100, position: [0, 0, 9] }}
         gl={{ antialias: true, alpha: true }}

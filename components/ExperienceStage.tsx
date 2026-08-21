@@ -11,7 +11,7 @@ import { useReveal } from "./RevealProvider";
 export function ExperienceStage() {
   const { easedProgress, rawProgress, narrow } = useScrollProgress();
   const reduced = useReducedMotion();
-  const { padState, revealed, dispatchScroll, flip } = useReveal();
+  const { padState, contentVisible, dispatchScroll, flip } = useReveal();
 
   const gateAnchorElRef = useRef<HTMLDivElement>(null);
   const pageTargetsRef = useRef<number[]>(padState.pageTargets);
@@ -35,7 +35,7 @@ export function ExperienceStage() {
         easedProgress={easedProgress}
         narrow={narrow}
         reduced={reduced}
-        revealed={revealed}
+        contentVisible={contentVisible}
         pageTargetsRef={pageTargetsRef}
         coverTargetRef={coverTargetRef}
         gateAnchorElRef={gateAnchorElRef}
