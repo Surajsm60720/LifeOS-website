@@ -3,12 +3,14 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import { RevealProvider, useReveal } from "./RevealProvider";
 
 function Probe() {
-  const { revealed, contentVisible, padState, dispatchScroll, flip, skipToRevealed } = useReveal();
+  const { revealed, contentVisible, visualCoverOpen, padState, dispatchScroll, flip, skipToRevealed } = useReveal();
   return (
     <>
       <span data-testid="state">{revealed ? "revealed" : "hidden"}</span>
       <span data-testid="content">{contentVisible ? "visible" : "hidden"}</span>
       <span data-testid="coverOpen">{padState.coverOpen ? "open" : "closed"}</span>
+      <span data-testid="visualCoverOpen">{visualCoverOpen ? "open" : "closed"}</span>
+      <span data-testid="pageTargets">{padState.pageTargets.join(",")}</span>
       <button onClick={() => dispatchScroll(0.9)}>scroll-in</button>
       <button onClick={() => dispatchScroll(0.5)}>scroll-back</button>
       <button onClick={flip}>flip</button>
@@ -77,6 +79,65 @@ describe("RevealProvider", () => {
     expect(screen.getByTestId("state")).toHaveTextContent("hidden");
     expect(screen.getByTestId("content")).toHaveTextContent("hidden");
     expect(screen.getByTestId("coverOpen")).toHaveTextContent("closed");
+  });
+
+  it("closing staggers pageTargets back to 0 one at a time, not all in the same tick", () => {
+    vi.useFakeTimers();
+    render(
+      <RevealProvider>
+        <Probe />
+      </RevealProvider>
+    );
+    act(() => fireEvent.click(screen.getByText("skip"))); // instant full-open, all 4 pages non-zero
+    const openTargets = screen.getByTestId("pageTargets").textContent;
+    expect(openTargets?.split(",").every((v) => v !== "0")).toBe(true);
+
+    act(() => fireEvent.click(screen.getByText("scroll-back")));
+    // coverOpen/flipped/content reset immediately...
+    expect(screen.getByTestId("coverOpen")).toHaveTextContent("closed");
+    // ...but the pages must NOT have all snapped to 0 in this same tick —
+    // that's the exact bug being fixed (closing was too fast to see).
+    expect(screen.getByTestId("pageTargets").textContent).toBe(openTargets);
+
+    // Advance past the full stagger — now every page should be closed.
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(screen.getByTestId("pageTargets")).toHaveTextContent("0,0,0,0");
+  });
+
+  it("holds the 3D cover visually open until the page stagger finishes, so it doesn't slam shut and hide it", () => {
+    vi.useFakeTimers();
+    render(
+      <RevealProvider>
+        <Probe />
+      </RevealProvider>
+    );
+    act(() => fireEvent.click(screen.getByText("skip")));
+    expect(screen.getByTestId("visualCoverOpen")).toHaveTextContent("open");
+
+    act(() => fireEvent.click(screen.getByText("scroll-back")));
+    // padState.coverOpen (Gate's signal) is already closed...
+    expect(screen.getByTestId("coverOpen")).toHaveTextContent("closed");
+    // ...but the 3D cover must still be held open while pages stagger shut.
+    expect(screen.getByTestId("visualCoverOpen")).toHaveTextContent("open");
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(screen.getByTestId("visualCoverOpen")).toHaveTextContent("closed");
+  });
+
+  it("closes the cover immediately if it was never flipped open — nothing to stagger", () => {
+    render(
+      <RevealProvider>
+        <Probe />
+      </RevealProvider>
+    );
+    fireEvent.click(screen.getByText("scroll-in"));
+    expect(screen.getByTestId("visualCoverOpen")).toHaveTextContent("open");
+    fireEvent.click(screen.getByText("scroll-back"));
+    expect(screen.getByTestId("visualCoverOpen")).toHaveTextContent("closed");
   });
 
   it("skipToRevealed jumps straight to revealed and content-visible without needing scroll or a delay", () => {

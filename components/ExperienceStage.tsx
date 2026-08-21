@@ -11,7 +11,7 @@ import { useReveal } from "./RevealProvider";
 export function ExperienceStage() {
   const { easedProgress, rawProgress, narrow } = useScrollProgress();
   const reduced = useReducedMotion();
-  const { padState, contentVisible, dispatchScroll, flip } = useReveal();
+  const { padState, contentVisible, visualCoverOpen, dispatchScroll, flip } = useReveal();
 
   const gateAnchorElRef = useRef<HTMLDivElement>(null);
   const pageTargetsRef = useRef<number[]>(padState.pageTargets);
@@ -19,10 +19,13 @@ export function ExperienceStage() {
 
   // Keep the mutable refs Pad/Pages/Cover read every frame in sync with
   // reducer state, without forcing the R3F tree to re-render each tick.
+  // Cover uses visualCoverOpen, not padState.coverOpen directly — see
+  // RevealProvider: closing holds the cover open until the staggered
+  // page-close has finished, so it doesn't slam shut over them.
   useEffect(() => {
     pageTargetsRef.current = padState.pageTargets;
-    coverTargetRef.current = padState.coverOpen ? -Math.PI * 0.98 : 0;
-  }, [padState.pageTargets, padState.coverOpen]);
+    coverTargetRef.current = visualCoverOpen ? -Math.PI * 0.98 : 0;
+  }, [padState.pageTargets, visualCoverOpen]);
 
   useEffect(() => {
     dispatchScroll(rawProgress);

@@ -26,13 +26,15 @@ export function padStateReducer(state: PadState, action: PadAction): PadState {
       if (!state.coverOpen && !state.flipped && action.progress >= COVER_OPEN_THRESHOLD) {
         return { ...state, coverOpen: true };
       }
-      // Scrolling back closes everything — cover and, if the pages had
-      // been turned, the pages too. This is the reversible "closing
-      // animation": pageTargets/coverOpen resetting to 0 here is what
-      // Pages.tsx/Cover.tsx pick up and damp back toward closed each
-      // frame, so the notebook visibly shuts as you scroll back to it.
+      // Scrolling back closes the cover/flipped flags immediately — Gate
+      // and the content crossfade both key off these and must react
+      // right away. pageTargets is deliberately left as-is here, not
+      // zeroed: RevealProvider watches flipped's true->false edge and
+      // staggers them closed itself (mirroring flip()'s staggered open),
+      // so the pages visibly shut one at a time instead of all snapping
+      // to closed in the same frame.
       if ((state.coverOpen || state.flipped) && action.progress <= COVER_CLOSE_THRESHOLD) {
-        return freshPadState();
+        return { ...state, coverOpen: false, flipped: false };
       }
       return state;
     }

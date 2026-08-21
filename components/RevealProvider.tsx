@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer, useRef, useState } from "react";
 import { padStateReducer, initialPadState, PAGE_OPEN_ANGLE, type PadState } from "@/lib/pad-state";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { focusFeatures } from "@/lib/focus-features";
@@ -17,6 +17,11 @@ type RevealContextValue = {
    *  page doesn't fade in over the pad while it's still mid-flip. Goes
    *  false the instant the pad closes, same as `revealed`. */
   contentVisible: boolean;
+  /** What Cover.tsx should actually animate toward — mirrors
+   *  padState.coverOpen except when closing from a flipped state: then
+   *  it stays open until the staggered page-close below has finished,
+   *  so the cover doesn't slam shut and hide that animation behind it. */
+  visualCoverOpen: boolean;
   dispatchScroll: (progress: number) => void;
   /** Deliberate "turn the page" interaction — requires the cover to
    *  already be open (via scroll), animates pages open with a stagger. */
@@ -45,6 +50,44 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     if (!padState.flipped) setContentVisible(false);
   }, [padState.flipped]);
+
+  // Closing the pad only resets coverOpen/flipped in the reducer —
+  // pageTargets is deliberately left untouched there. This effect plays
+  // the actual closing sequence, mirroring flip()'s opening sequence in
+  // reverse: pages stagger shut one at a time (last-opened-first), and
+  // the cover is held open (via visualCoverOpen) until that stagger has
+  // finished, THEN closes over them last. Without the hold, the cover
+  // — which isn't staggered, it just tracks coverOpen directly — snaps
+  // shut in the same frame the pages start closing and physically hides
+  // the page-close animation behind it, which is why closing read as
+  // "instant" even after pageTargets itself was fixed to stagger.
+  const wasFlippedRef = useRef(false);
+  const [visualCoverOpen, setVisualCoverOpen] = useState(false);
+  useEffect(() => {
+    const closingFromFlipped = wasFlippedRef.current && !padState.flipped;
+
+    if (padState.coverOpen) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect -- visualCoverOpen tracks coverOpen asymmetrically (opens in lockstep, closes delayed below), not derivable during render */
+      setVisualCoverOpen(true);
+    } else if (closingFromFlipped) {
+      for (let i = 0; i < PAGE_COUNT; i++) {
+        const pageIndex = PAGE_COUNT - 1 - i;
+        const delay = reduced ? 0 : i * PAGE_FLIP_STAGGER_MS;
+        setTimeout(() => dispatch({ type: "SET_PAGE_TARGET", index: pageIndex, value: 0 }), delay);
+      }
+      const staggerDuration = reduced ? 0 : PAGE_COUNT * PAGE_FLIP_STAGGER_MS;
+      const timer = setTimeout(() => setVisualCoverOpen(false), staggerDuration);
+      wasFlippedRef.current = padState.flipped;
+      return () => clearTimeout(timer);
+    } else {
+      // Cover closing without ever having been flipped open (approached
+      // via scroll, then scrolled back without clicking) — nothing to
+      // stagger, close it immediately like before.
+      setVisualCoverOpen(false);
+    }
+
+    wasFlippedRef.current = padState.flipped;
+  }, [padState.coverOpen, padState.flipped, reduced]);
 
   const dispatchScroll = useCallback((progress: number) => {
     dispatch({ type: "SCROLL_PROGRESS", progress });
@@ -79,7 +122,15 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <RevealContext.Provider
-      value={{ padState, revealed: padState.flipped, contentVisible, dispatchScroll, flip, skipToRevealed }}
+      value={{
+        padState,
+        revealed: padState.flipped,
+        contentVisible,
+        visualCoverOpen,
+        dispatchScroll,
+        flip,
+        skipToRevealed,
+      }}
     >
       {children}
     </RevealContext.Provider>

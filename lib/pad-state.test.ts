@@ -42,14 +42,21 @@ describe("padStateReducer", () => {
     expect(next).toEqual(initialPadState);
   });
 
-  it("scrolling back after flip resets everything to closed — the closing animation", () => {
+  it("scrolling back after flip resets coverOpen/flipped immediately", () => {
     const open = padStateReducer(initialPadState, { type: "SCROLL_PROGRESS", progress: 0.9 });
     const flipped = padStateReducer(open, { type: "FLIP" });
     const withOpenPages = padStateReducer(flipped, { type: "SET_PAGE_TARGET", index: 0, value: -3 });
     const afterScrollUp = padStateReducer(withOpenPages, { type: "SCROLL_PROGRESS", progress: 0.5 });
     expect(afterScrollUp.coverOpen).toBe(false);
     expect(afterScrollUp.flipped).toBe(false);
-    expect(afterScrollUp.pageTargets).toEqual([0, 0, 0, 0]);
+  });
+
+  it("does NOT zero pageTargets on close — that's RevealProvider's staggered job, not the reducer's", () => {
+    const open = padStateReducer(initialPadState, { type: "SCROLL_PROGRESS", progress: 0.9 });
+    const flipped = padStateReducer(open, { type: "FLIP" });
+    const withOpenPages = padStateReducer(flipped, { type: "SET_PAGE_TARGET", index: 0, value: -3 });
+    const afterScrollUp = padStateReducer(withOpenPages, { type: "SCROLL_PROGRESS", progress: 0.5 });
+    expect(afterScrollUp.pageTargets).toEqual(withOpenPages.pageTargets);
   });
 
   it("SET_PAGE_TARGET updates only the targeted page index", () => {
