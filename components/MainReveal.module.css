@@ -4,7 +4,10 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity .8s ease;
-  background: var(--elevated);
+  padding-block: clamp(3rem, 8vw, 6rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 6vw, 4rem);
 }
 .revealed {
   opacity: 1;

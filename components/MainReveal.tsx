@@ -6,14 +6,12 @@ import { ContentPage } from "./ContentPage";
 import { FeatureSection } from "./FeatureSection";
 import { SpecList } from "./SpecList";
 import { DeliberatelyAbsent } from "./DeliberatelyAbsent";
-import { MarginRings } from "./MarginRings";
 import { contentPages } from "@/lib/content";
 
 export function MainReveal() {
   const { contentVisible } = useReveal();
   return (
     <main className={`${styles.main} ${contentVisible ? styles.revealed : ""}`}>
-      <MarginRings />
       {contentPages.map((page) => (
         <ContentPage key={page.label} label={page.label}>
           {page.blocks.map((block, i) => {

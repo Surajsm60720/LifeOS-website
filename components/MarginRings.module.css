@@ -1,30 +1,34 @@
 /*
- * Fixed to the viewport, not one page's edge — a persistent spine down
- * the left side of the screen for as long as content is showing, since
- * pages are full-bleed now and no longer each have their own edge to
- * hang a ring binding off.
+ * Spiral-binding rings astride the top edge of a page — same silhouette
+ * as the gate card and the 3D pad, so every content page reads as a
+ * page of the same physical notebook instead of a generic dark card.
  */
 .rings {
-  position: fixed;
-  left: clamp(10px, 2vw, 26px);
-  top: 50vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   transform: translateY(-50%);
   display: flex;
-  flex-direction: column;
-  gap: 2.1rem;
+  justify-content: space-evenly;
+  padding-inline: 10%;
   pointer-events: none;
 }
 .rings span {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 18px;
+  height: 26px;
+  border-radius: 999px;
   border: 3px solid;
   background: var(--canvas);
-  opacity: .55;
+  opacity: .85;
 }
-.coral { border-color: var(--coral); }
-.mint { border-color: var(--mint); }
+/* Qualified with .rings span to match that rule's specificity — the
+   shorthand `border: 3px solid` above implicitly sets border-color to
+   currentColor, and a bare .coral/.mint (lower specificity) loses to
+   that despite coming later in the file. */
+.rings span.coral { border-color: var(--coral); }
+.rings span.mint { border-color: var(--mint); }
 
 @media (max-width: 880px) {
-  .rings { display: none; }
+  .rings span { width: 14px; height: 20px; }
 }

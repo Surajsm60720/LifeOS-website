@@ -3,9 +3,9 @@ import styles from "./MarginRings.module.css";
 const RING_COUNT = 7;
 
 /**
- * Static decorative spiral-binding dots along the page card's left edge —
- * a restrained echo of the 3D pad's ring geometry, so the bounded content
- * column still reads as "the notebook" rather than a plain card.
+ * Static spiral-binding rings astride a page's top edge — matches the
+ * gate card and the 3D pad's own ring geometry, so a content page reads
+ * as literally a page of the same notebook, not a generic dark card.
  */
 export function MarginRings() {
   return (
