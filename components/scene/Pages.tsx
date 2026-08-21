@@ -7,7 +7,11 @@ import { PAGE_COUNT } from "@/lib/constants";
 
 const W = 3.05;
 const H = 3.85;
-const SHADES = [0xfef3e0, 0xf7e9d4, 0xf1e2cc, 0xebdbc4];
+// Dark, not the cream of the icon's own calendar illustration — the
+// icon's cover texture stays untouched (that's real product art), but
+// these are the site's own invented page material, and the site is
+// dark-theme only with no light surfaces, full stop.
+const SHADES = [0x28282c, 0x2c2c30, 0x252529, 0x302f34];
 const DAMPING = 0.1;
 
 type PagesProps = {
@@ -21,7 +25,7 @@ export function Pages({ targetsRef, reduced }: PagesProps) {
   const hingeRefs = useRef<(THREE.Object3D | null)[]>([]);
 
   const materials = useMemo(
-    () => SHADES.map((shade) => new THREE.MeshStandardMaterial({ color: shade, roughness: 0.95, side: THREE.DoubleSide })),
+    () => SHADES.map((shade) => new THREE.MeshStandardMaterial({ color: shade, roughness: 0.7, side: THREE.DoubleSide })),
     []
   );
   const geometry = useMemo(() => new THREE.PlaneGeometry(W - 0.22, H - 0.62), []);

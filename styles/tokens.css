@@ -23,6 +23,9 @@
   --violet: #A08CDC;
   --mint: #8CC8B4;
   --ink: #3E52B5;
+  /* --ink lightened for legibility on dark backgrounds — same blue-pen
+     hue, just readable outside the one place --ink itself sits on cream */
+  --ink-light: #9CACE8;
 
   --ui: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   --mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;

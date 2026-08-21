@@ -23,6 +23,7 @@ describe("design tokens", () => {
     ["--violet", "#A08CDC"],
     ["--mint", "#8CC8B4"],
     ["--ink", "#3E52B5"],
+    ["--ink-light", "#9CACE8"],
   ])("defines %s as %s", (varName, hex) => {
     expect(css).toMatch(new RegExp(`${varName}\\s*:\\s*${hex}`, "i"));
   });
