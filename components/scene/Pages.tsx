@@ -22,11 +22,22 @@ const HEIGHT_SEGMENTS = 20;
 // paper flutters: a big primary bow, plus a cross-width ripple that's
 // most active while actually turning, plus a small continuous idle wave
 // so it's never perfectly flat even at rest.
-const MAX_CURL = 0.55; // world units of primary bow at the free edge, at peak mid-flip
-const RIPPLE_AMPLITUDE = 0.16;
+const MAX_CURL = 0.5; // ceiling: world units of primary bow at the free edge, once safely past edge-on
+const RIPPLE_AMPLITUDE = 0.15; // ceiling, same story as MAX_CURL
 const RIPPLE_FREQUENCY = 2.4;
-const IDLE_AMPLITUDE = 0.035;
+const IDLE_AMPLITUDE = 0.02;
 const IDLE_FREQUENCY = 1.6;
+// Cover's hinge sits at world Z 0.115 (Cover.tsx). A vertex's curl is an
+// offset along the mesh's local Z, which projects toward the camera/cover
+// by roughly cos(rotation) — near-total near closed, near-zero once edge-on.
+// A hard on/off gate at 90° reads as "dead, then suddenly alive," which is
+// its own kind of stiff. Instead, cap each effect's *raw* amplitude so its
+// worst-case projection (amplitude * cos(rotation)) never exceeds a fixed
+// safe margin, at every rotation angle — small-but-nonzero flutter from the
+// very start of the flip, growing smoothly as cos(rotation) shrinks, and
+// reaching full ceiling amplitude once the page is safely near edge-on.
+const SAFE_MARGIN_CURL = 0.055;
+const SAFE_MARGIN_RIPPLE = 0.02;
 
 type PagesProps = {
   /** Current per-page rotation targets (radians), updated externally by the pad-state reducer. */
@@ -68,24 +79,16 @@ export function Pages({ targetsRef, reduced }: PagesProps) {
       const progress = Math.min(1, Math.abs(hinge.rotation.x) / MAX_ROTATION);
       const flipShape = Math.sin(progress * Math.PI); // 0 at rest, 1 at mid-flip
 
-      // A vertex's curl is offset along the MESH's local Z, which only
-      // points toward the camera/cover while the page is still within
-      // ~90° of closed — past that, cos(rotation) goes negative and the
-      // same local offset bows away instead. cover's hinge sits at world
-      // Z 0.115 (Cover.tsx); a page still nearly flat against it (small
-      // rotation, cos(rotation)≈1) turns even a modest curl into a
-      // visible chunk of dark geometry poking in front of the icon —
-      // exactly the glitch this gate exists to prevent. Full flutter
-      // only switches on once the page has rotated past being roughly
-      // edge-on to the camera, where it's geometrically safe regardless
-      // of amplitude.
-      const safety = Math.max(0, -Math.cos(hinge.rotation.x));
+      const cosR = Math.abs(Math.cos(hinge.rotation.x));
+      const curlCap = cosR > 1e-3 ? Math.min(MAX_CURL, SAFE_MARGIN_CURL / cosR) : MAX_CURL;
+      const rippleCap = cosR > 1e-3 ? Math.min(RIPPLE_AMPLITUDE, SAFE_MARGIN_RIPPLE / cosR) : RIPPLE_AMPLITUDE;
 
-      const primaryCurl = flipShape * MAX_CURL * safety;
+      const primaryCurl = flipShape * curlCap;
       // No floor here — ripple must reach exactly 0 at rest, same bug
-      // class as the clipping above (a "never quite zero" strength was
-      // enough to bow a closed page's free edge in front of the cover).
-      const rippleStrength = flipShape * flipShape * RIPPLE_AMPLITUDE * safety;
+      // class as the clipping this whole cap scheme guards against (a
+      // "never quite zero" strength was enough to bow a closed page's
+      // free edge in front of the cover).
+      const rippleStrength = flipShape * flipShape * rippleCap;
       const phase = time * 2.2 + i * 1.7;
 
       for (let v = 0; v < position.count; v++) {
@@ -96,9 +99,10 @@ export function Pages({ targetsRef, reduced }: PagesProps) {
 
         const bow = primaryCurl * tFalloff;
         const ripple = Math.sin(localX * RIPPLE_FREQUENCY + phase) * rippleStrength * tFalloff;
-        // Idle wave is small enough (0.035 peak) to stay safe unconditionally
-        // even at rotation 0 — it's the "never perfectly flat" touch, not
-        // part of the flip flourish, so it isn't gated by `safety`.
+        // Idle wave is small enough (0.02 peak) to stay within the combined
+        // safety budget unconditionally, even at rotation 0 — it's the
+        // "never perfectly flat" touch, not part of the flip flourish, so
+        // it isn't capped like curl/ripple above.
         const idle = Math.sin(t * Math.PI * 1.4 + time * IDLE_FREQUENCY + i * 0.9) * IDLE_AMPLITUDE * t;
 
         position.setZ(v, bow + ripple + idle);
