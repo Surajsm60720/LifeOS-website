@@ -1,0 +1,9 @@
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .6s cubic-bezier(.2, .7, .3, 1), transform .6s cubic-bezier(.2, .7, .3, 1);
+}
+.in {
+  opacity: 1;
+  transform: none;
+}

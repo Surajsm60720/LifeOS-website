@@ -1,6 +1,7 @@
 import styles from "./FeatureSection.module.css";
 import type { FeatureSection as FeatureSectionData } from "@/lib/content";
 import { MediaSlot } from "./MediaSlot";
+import { Reveal } from "./Reveal";
 
 export function FeatureSection({ section }: { section: FeatureSectionData }) {
   return (
@@ -11,16 +12,16 @@ export function FeatureSection({ section }: { section: FeatureSectionData }) {
         {section.lede && <p>{section.lede}</p>}
       </div>
       <div className={styles.list}>
-        {section.cards.map((card) => (
-          <div className={styles.row} key={card.title}>
+        {section.cards.map((card, i) => (
+          <Reveal key={card.title} className={styles.row}>
             <span className={styles.tag}>
               <i className={styles.dot} style={{ background: `var(${card.dotVar})` }} />
               {card.tag}
             </span>
             <h3>{card.title}</h3>
             <p>{card.body}</p>
-            <MediaSlot />
-          </div>
+            <MediaSlot seed={i} />
+          </Reveal>
         ))}
       </div>
     </section>

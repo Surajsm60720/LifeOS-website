@@ -5,11 +5,12 @@ import {
   deliberatelyAbsentLede,
   deliberatelyAbsent,
 } from "@/lib/content";
+import { Reveal } from "./Reveal";
 
 export function DeliberatelyAbsent() {
   return (
     <section className={styles.section}>
-      <div className={styles.out}>
+      <Reveal className={styles.out}>
         <p className="eyebrow">{deliberatelyAbsentEyebrow}</p>
         <h2 className={styles.heading}>{deliberatelyAbsentHeading}</h2>
         <p>{deliberatelyAbsentLede}</p>
@@ -18,7 +19,7 @@ export function DeliberatelyAbsent() {
             <li key={item}>{item}</li>
           ))}
         </ul>
-      </div>
+      </Reveal>
     </section>
   );
 }

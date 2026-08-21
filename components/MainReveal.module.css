@@ -5,44 +5,11 @@
   pointer-events: none;
   transition: opacity .8s ease;
   padding-block: clamp(3rem, 8vw, 6rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3.5rem);
 }
 .revealed {
   opacity: 1;
   pointer-events: auto;
-}
-
-/*
- * The bounded "page" the notebook opens into. Structurally this still
- * reads as a notebook page — bounded column, rounded card, ring binding
- * on the edge, ruled-line texture — but the app itself is dark-theme
- * only with neutral cool-gray accents and no warm punch (verbatim from
- * LifeOSTheme.swift's own doc comment), so the color identity here
- * stays dark/gray/white, matching the real app, rather than the cream
- * paper look (which stays where it belongs: the gate page during the
- * flip moment, a deliberate one-time signature accent, not the ongoing
- * reading surface).
- */
-.page {
-  position: relative;
-  width: min(760px, calc(100% - 2 * var(--gut)));
-  margin-inline: auto;
-  overflow: hidden;
-  background: var(--elevated);
-  border: 1px solid var(--stroke);
-  border-radius: 28px;
-  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .03) inset;
-  padding: clamp(1.8rem, 5vw, 3.25rem);
-}
-
-.page::before {
-  content: "";
-  position: absolute;
-  inset: 5rem 1.6rem 2rem;
-  pointer-events: none;
-  opacity: .5;
-  background: repeating-linear-gradient(transparent 0 25px, rgba(255, 255, 255, .05) 25px 26px);
-}
-
-@media (max-width: 880px) {
-  .page { border-radius: 18px; }
 }

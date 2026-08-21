@@ -212,3 +212,33 @@ export const footerEyebrow = "Build it yourself";
 export const footerBody =
   "A personal project, not an App Store release. Clone the repo, open it in Xcode with your own signing team, and run it.";
 export const footerSmallLines = ["LifeOS v1.0.2", "Swift · SwiftUI · SwiftData", "Local-first by design"];
+
+// Groups the sections above into the notebook's 4 physical pages, so the
+// content reads as pages of the pad rather than one undifferentiated
+// scroll of cards. `spec`/`absent` reference the singleton content
+// above by kind rather than duplicating it.
+export type PageBlock =
+  | { kind: "feature"; section: FeatureSection }
+  | { kind: "spec" }
+  | { kind: "absent" };
+
+export type ContentPage = { label: string; blocks: PageBlock[] };
+
+export const contentPages: ContentPage[] = [
+  { label: "01", blocks: [{ kind: "feature", section: featureSections[0] }] },
+  {
+    label: "02",
+    blocks: [
+      { kind: "feature", section: featureSections[1] },
+      { kind: "feature", section: featureSections[2] },
+    ],
+  },
+  {
+    label: "03",
+    blocks: [
+      { kind: "feature", section: featureSections[3] },
+      { kind: "feature", section: featureSections[4] },
+    ],
+  },
+  { label: "04", blocks: [{ kind: "spec" }, { kind: "absent" }] },
+];

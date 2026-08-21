@@ -31,6 +31,12 @@ test.describe("LifeOS site", () => {
   });
 
   test("no accessibility violations after reveal", async ({ page }) => {
+    // Reduced motion makes every fade — main's crossfade and each row's
+    // scroll-triggered Reveal — resolve instantly instead of animating.
+    // Without this, axe can scan mid-transition and measure text against
+    // a still-transparent ancestor (main's own fade) or an unscrolled,
+    // not-yet-revealed row (Reveal's), producing false contrast findings.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     // The skip link is intentionally off-screen until keyboard-focused
     // (visually-hidden-until-focus pattern), so activate it the way a
@@ -39,10 +45,6 @@ test.describe("LifeOS site", () => {
     await page.getByRole("link", { name: /skip intro/i }).focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("heading", { name: "Everything is an entry." })).toBeVisible();
-    // The reveal fades `main` in over .8s — wait for that transition to
-    // finish before scanning, otherwise axe measures text against the
-    // still-transparent ancestor's opacity and reports false contrast
-    // violations mid-fade.
     await expect(page.locator("main")).toHaveCSS("opacity", "1");
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
