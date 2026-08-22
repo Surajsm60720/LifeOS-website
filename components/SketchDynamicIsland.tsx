@@ -13,10 +13,10 @@ export function SketchDynamicIsland({ caption }: { caption: string }) {
   return (
     <figure className={styles.sketch} aria-hidden="true">
       <svg className={styles.glyph} viewBox="0 0 200 170" fill="none">
-        <rect className={styles.pill} x="82" y="14" width="36" height="26" rx="13" />
+        <rect className={styles.pill} x="76" y="14" width="48" height="26" rx="13" />
 
-        <circle className={styles.sensor} cx="104" cy="27" r="4" />
-        <ellipse className={styles.sensor} cx="91" cy="27" rx="3" ry="2.4" />
+        <circle className={styles.sensor} cx="106" cy="27" r="4" />
+        <ellipse className={styles.sensor} cx="88" cy="27" rx="5" ry="3.8" />
 
         <g className={styles.leadingIcon} strokeWidth="1.8">
           <line x1="58" y1="23" x2="70" y2="23" />

@@ -30,7 +30,7 @@
   fill: var(--elevated);
   stroke: var(--ink-light);
   stroke-width: 2.4;
-  animation: morph-pill 7s linear infinite;
+  animation: morph-pill 4.5s linear infinite;
 }
 
 /* The two sensor cutouts — camera and the smaller proximity/light
@@ -47,7 +47,7 @@
   stroke: var(--ink-light);
   stroke-linecap: round;
   opacity: 0;
-  animation: show-leading 7s linear infinite;
+  animation: show-leading 4.5s linear infinite;
 }
 
 .count {
@@ -55,19 +55,19 @@
   font-size: 16px;
   fill: var(--violet);
   opacity: 0;
-  animation: show-count 7s linear infinite;
+  animation: show-count 4.5s linear infinite;
 }
 
 .divider {
   stroke: var(--stroke-2);
   opacity: 0;
-  animation: show-divider 7s linear infinite;
+  animation: show-divider 4.5s linear infinite;
 }
 
 .row { opacity: 0; }
-.row1 { animation: show-row1 7s linear infinite; }
-.row2 { animation: show-row2 7s linear infinite; }
-.row3 { animation: show-row3 7s linear infinite; }
+.row1 { animation: show-row1 4.5s linear infinite; }
+.row2 { animation: show-row2 4.5s linear infinite; }
+.row3 { animation: show-row3 4.5s linear infinite; }
 
 .row line { stroke-linecap: round; }
 .dotIrl { fill: var(--irl); }
@@ -77,12 +77,12 @@
 .time { stroke: var(--stroke-2); }
 
 @keyframes morph-pill {
-  0%, 8% { x: 82px; width: 36px; height: 26px; rx: 13px; }
+  0%, 8% { x: 76px; width: 48px; height: 26px; rx: 13px; }
   20% { x: 40px; width: 120px; height: 26px; rx: 13px; }
   36% { x: 40px; width: 120px; height: 26px; rx: 13px; }
   50% { x: 20px; width: 160px; height: 140px; rx: 24px; }
   74% { x: 20px; width: 160px; height: 140px; rx: 24px; }
-  88%, 100% { x: 82px; width: 36px; height: 26px; rx: 13px; }
+  88%, 100% { x: 76px; width: 48px; height: 26px; rx: 13px; }
 }
 
 @keyframes show-leading {
