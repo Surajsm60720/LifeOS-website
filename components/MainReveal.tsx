@@ -23,10 +23,17 @@ export function MainReveal() {
   const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [turn, setTurn] = useState<{ direction: 1 | -1 } | null>(null);
+  // True whenever scroll has reached the slot this section reserves in
+  // the document — see the .runway placeholder below. The notebook
+  // itself is a fixed overlay now (see .main), not a normal-flow block,
+  // so this is the only thing that actually knows "the visitor has
+  // scrolled to where this section lives."
+  const [inView, setInView] = useState(false);
 
   const busyRef = useRef(false);
   const touchStartYRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const runwayRef = useRef<HTMLDivElement>(null);
   const pendingFocusRef = useRef<PendingFocus>(null);
 
   const lastIndex = contentPages.length - 1;
@@ -56,6 +63,33 @@ export function MainReveal() {
     },
     [index, lastIndex, reduced]
   );
+
+  // The notebook only ever occupied its slot correctly if scroll landed
+  // *exactly* on the boundary of a normal-flow 100dvh block — anything
+  // short of that (scrolling that doesn't hover precisely over the
+  // element the old wheel listener was attached to, momentum scroll
+  // continuing under a stationary cursor, a dvh rounding difference)
+  // left it showing some scrolled-past middle slice of itself with the
+  // footer already bleeding in underneath. Confirmed from a screen
+  // recording: page content with its own top cut off and "BUILD IT
+  // YOURSELF" visible in the same frame, which is only possible if the
+  // block actually on screen is shorter than the real viewport.
+  //
+  // Fixed the same way Scene/Gate already solve this exact problem for
+  // the 3D pad: the thing that's actually visible is `position: fixed;
+  // inset: 0`, which is unambiguous about matching the real viewport no
+  // matter what scroll position got you there. `.runway` below is a
+  // plain normal-flow placeholder that exists purely to reserve 100dvh
+  // of document height (so the footer still lands in the right place)
+  // and to tell us, via IntersectionObserver, whether we're currently
+  // scrolled to where this section lives.
+  useEffect(() => {
+    const el = runwayRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Decoupled from the hero/gate's "see the features" links via a DOM
   // event, since focus-features.ts is a plain utility with no reference
@@ -100,62 +134,53 @@ export function MainReveal() {
     el.focus({ preventScroll: true });
   }, [index]);
 
-  // Wheel and touchmove are wired up as raw, non-passive listeners
-  // rather than React's onWheel/onTouchMove — React (and browsers, by
-  // default) treat those as passive for scroll-performance reasons,
-  // which means e.preventDefault() inside them silently does nothing.
-  // Confirmed by testing the JSX version first: Chrome logged "Unable
-  // to preventDefault inside passive event listener invocation" on
-  // every wheel tick, and native scroll kept fighting the page-turn.
-  // Re-attached whenever `goTo` changes identity (i.e. whenever `index`
-  // changes) so the closure here is never reading a stale page index.
+  // Wheel and touchmove are wired up as raw, non-passive listeners on
+  // `window` — not React's onWheel/onTouchMove (passive by default,
+  // e.preventDefault() silently does nothing — confirmed live, Chrome
+  // logged the exact warning), and not on the notebook element itself
+  // either anymore. Attaching to one specific element meant scroll that
+  // didn't dispatch its event to that exact target — cursor position
+  // slightly off it, a scrollbar drag, momentum scroll continuing
+  // elsewhere — bypassed pagination entirely. `inView` (from the
+  // IntersectionObserver above) is what gates this now: engaged
+  // whenever scroll has reached this section, regardless of where the
+  // pointer happens to be.
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
     function onWheel(e: WheelEvent) {
+      if (!inView) return;
       const wantsNext = e.deltaY > 0;
       // At either end, do nothing at all — that lets the gesture fall
       // through to native scroll, carrying the visitor on into the
       // footer or back up toward the pad, without this ever trapping
       // the page. This boundary check must be the ONLY thing deciding
-      // whether native scroll gets a look at the event. It used to also
-      // skip preventDefault for small deltas, on the theory that tiny
-      // ticks aren't a deliberate flick — but real trackpad scrolling
-      // sends a continuous stream of many small-delta events (gesture
-      // noise, deceleration tail), and every one of those was leaking
-      // straight through to native document scroll while still deep in
-      // the middle of pagination. Confirmed live: enough of them in a
-      // row drifted window.scrollY back down across the pad's own
-      // close threshold, reopening the gate simultaneously with page 5
-      // and the footer, all three visible at once. Small deltas now
-      // still get swallowed here — they just don't trigger a page turn.
+      // whether native scroll gets a look at the event — it used to
+      // also skip preventDefault for small deltas, on the theory that
+      // tiny ticks aren't a deliberate flick, but real trackpad
+      // scrolling sends a continuous stream of small-delta events
+      // (gesture noise, deceleration tail) that all leaked through to
+      // native scroll while still deep in the middle of pagination.
       if (wantsNext ? index === lastIndex : index === 0) return;
       e.preventDefault();
       if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
-      el?.focus({ preventScroll: true });
+      containerRef.current?.focus({ preventScroll: true });
       goTo(index + (wantsNext ? 1 : -1));
     }
 
     function onTouchMove(e: TouchEvent) {
-      if (touchStartYRef.current === null) return;
+      if (!inView || touchStartYRef.current === null) return;
       const dy = touchStartYRef.current - (e.touches[0]?.clientY ?? touchStartYRef.current);
       const wantsNext = dy > 0;
       const atBoundary = wantsNext ? index === lastIndex : index === 0;
-      // Same reasoning as onWheel: only the boundary decides whether
-      // native scroll gets the event. Small per-frame touch deltas
-      // (finger tremor during an otherwise deliberate swipe) used to
-      // fall through here too.
       if (!atBoundary) e.preventDefault();
     }
 
-    el.addEventListener("wheel", onWheel, { passive: false });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
     return () => {
-      el.removeEventListener("wheel", onWheel);
-      el.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchmove", onTouchMove);
     };
-  }, [goTo, index, lastIndex]);
+  }, [goTo, index, lastIndex, inView]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartYRef.current = e.touches[0]?.clientY ?? null;
@@ -187,28 +212,35 @@ export function MainReveal() {
   );
 
   const page = contentPages[index];
+  const visible = contentVisible && inView;
 
   return (
-    <main
-      ref={containerRef}
-      id="notebook"
-      tabIndex={-1}
-      className={`${styles.main} ${contentVisible ? styles.revealed : ""}`}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onKeyDown={handleKeyDown}
-    >
-      <ContentPage key={page.label} label={page.label}>
-        {page.sections.map((section) => (
-          <FeatureSection section={section} key={section.heading} />
-        ))}
-      </ContentPage>
-      {turn && <PageCurl direction={turn.direction} durationMs={TURN_MS} />}
-      <div className={styles.dots} aria-hidden="true">
-        {contentPages.map((p, i) => (
-          <span key={p.label} className={i === index ? styles.dotActive : styles.dot} />
-        ))}
-      </div>
-    </main>
+    <>
+      {/* Reserves this section's place in the document's scroll height
+          and tells us (via the observer above) when we've arrived —
+          nothing is ever drawn here. */}
+      <div ref={runwayRef} className={styles.runway} aria-hidden="true" />
+      <main
+        ref={containerRef}
+        id="notebook"
+        tabIndex={-1}
+        className={`${styles.main} ${visible ? styles.visible : ""}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onKeyDown={handleKeyDown}
+      >
+        <ContentPage key={page.label} label={page.label}>
+          {page.sections.map((section) => (
+            <FeatureSection section={section} key={section.heading} />
+          ))}
+        </ContentPage>
+        {turn && <PageCurl direction={turn.direction} durationMs={TURN_MS} />}
+        <div className={styles.dots} aria-hidden="true">
+          {contentPages.map((p, i) => (
+            <span key={p.label} className={i === index ? styles.dotActive : styles.dot} />
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

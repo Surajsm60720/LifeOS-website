@@ -1,27 +1,37 @@
 /*
- * A single 100dvh slot in normal document flow — not fixed, not
- * sticky. Wheel/touch/keyboard are intercepted here to page between
- * notebook pages, but at either end (first page going back, last page
- * going forward) the handlers deliberately do nothing, letting the
- * gesture fall through to ordinary scroll and carry the visitor out of
- * this slot entirely. That's what keeps this from ever trapping the
- * page — no explicit "exit pagination" logic needed.
+ * Same pattern as ExperienceStage's own runway + fixed Scene/Gate: a
+ * plain normal-flow placeholder reserves this section's scroll height,
+ * while the thing actually drawn is `position: fixed`, which is
+ * unambiguous about matching the real viewport regardless of exactly
+ * where scroll lands. A normal-flow 100dvh block was tried first and
+ * genuinely doesn't hold up here — any scroll that doesn't land exactly
+ * on its boundary (cursor not precisely over it, momentum scroll,
+ * dvh/viewport rounding) left it rendering a scrolled-past middle slice
+ * of itself with the footer already bleeding in beneath, confirmed from
+ * a screen recording.
  */
-.main {
-  position: relative;
-  z-index: 2;
+.runway {
   height: 100dvh;
-  overflow: hidden;
+  position: relative;
+  pointer-events: none;
+}
+
+.main {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   outline: none;
-  transition: opacity .6s ease;
+  transition: opacity .6s ease, visibility .6s;
 }
-.revealed {
+.visible {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
