@@ -33,6 +33,22 @@ describe("feature sections", () => {
   it("the first section has id 'features' for the post-flip scroll target", () => {
     expect(featureSections[0].id).toBe("features");
   });
+
+  it("every card with a sketch also has the handwritten caption that goes under it", () => {
+    // The two are typed independently but rendered together, so a sketch
+    // without its caption ships an empty line of Caveat under the drawing.
+    for (const section of featureSections) {
+      for (const card of section.cards) {
+        if (!card.sketch) continue;
+        expect(card.sketchCaption?.trim().length ?? 0).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("the App Lock entry draws Face ID rather than reserving a photo slot", () => {
+    const appLock = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "App Lock");
+    expect(appLock?.sketch).toBe("faceid");
+  });
 });
 
 describe("content pages", () => {

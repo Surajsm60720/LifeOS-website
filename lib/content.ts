@@ -4,7 +4,22 @@
 // (see the design spec, §0).
 
 export type ChipSegment = { text: string; bold?: boolean };
-export type FeatureCard = { tag: string; dotVar: string; title: string; body: string };
+/**
+ * Entries that have a hand-drawn accent instead of the taped "photo
+ * pending" slot. Only the ones whose behaviour is drawable in a few pen
+ * strokes get one — a sketch that needs explaining is worse than the
+ * honest placeholder.
+ */
+export type SketchKind = "faceid";
+export type FeatureCard = {
+  tag: string;
+  dotVar: string;
+  title: string;
+  body: string;
+  sketch?: SketchKind;
+  /** Handwritten line under the sketch. Required whenever `sketch` is set. */
+  sketchCaption?: string;
+};
 export type FeatureSection = {
   id?: string;
   eyebrow: string;
@@ -156,6 +171,8 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--gold",
         title: "Face ID on return",
         body: "Optional biometric or passcode lock that covers sheets too, plus a recovery mode that degrades gracefully instead of crash-looping if the store fails to open.",
+        sketch: "faceid",
+        sketchCaption: "just your face —",
       },
     ],
   },

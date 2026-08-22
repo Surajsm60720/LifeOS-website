@@ -1,6 +1,7 @@
 import styles from "./FeatureSection.module.css";
 import type { FeatureSection as FeatureSectionData } from "@/lib/content";
 import { MediaSlot } from "./MediaSlot";
+import { SketchFaceID } from "./SketchFaceID";
 import { Reveal } from "./Reveal";
 
 export function FeatureSection({ section }: { section: FeatureSectionData }) {
@@ -22,7 +23,11 @@ export function FeatureSection({ section }: { section: FeatureSectionData }) {
               <h3>{card.title}</h3>
               <p>{card.body}</p>
             </div>
-            <MediaSlot seed={i} />
+            {card.sketch === "faceid" ? (
+              <SketchFaceID caption={card.sketchCaption ?? ""} />
+            ) : (
+              <MediaSlot seed={i} />
+            )}
           </Reveal>
         ))}
       </div>

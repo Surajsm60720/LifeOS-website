@@ -1,0 +1,133 @@
+/*
+ * Occupies the same slot footprint as MediaSlot so the alternating
+ * left/right row layout in FeatureSection lines up either way — but no
+ * frame and no tape, because this is a doodle on the page itself rather
+ * than a photo stuck onto it.
+ */
+.sketch {
+  --loop: 6s;
+  position: relative;
+  width: clamp(140px, 24vw, 220px);
+  flex: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  transform: rotate(-2deg);
+}
+
+@media (max-width: 720px) {
+  .sketch { width: min(76%, 220px); margin-top: .5rem; align-items: flex-start; }
+}
+
+.glyph {
+  width: 100%;
+  max-width: 152px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+/* Blue pen: the same --ink-light the gate's scrawl is written in, so the
+   drawing and the handwriting read as the same hand. */
+.stroke {
+  stroke: var(--ink-light);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/*
+ * One shared --loop on every part, with the timing written as
+ * percentages of it rather than as delays, so the beats stay locked
+ * together: frame, then face, then a sweep, then the tick.
+ */
+.frame .stroke { animation: draw-frame var(--loop) linear infinite; }
+.frame .stroke:nth-child(2) { animation-delay: .09s; }
+.frame .stroke:nth-child(3) { animation-delay: .18s; }
+.frame .stroke:nth-child(4) { animation-delay: .27s; }
+
+.face .stroke { animation: draw-face var(--loop) linear infinite; }
+.face .stroke:nth-child(2) { animation-delay: .1s; }
+.face .stroke:nth-child(3) { animation-delay: .2s; }
+.face .stroke:nth-child(4) { animation-delay: .3s; }
+
+.check {
+  stroke: var(--mint);
+  animation: draw-check var(--loop) linear infinite;
+}
+
+/* The recognition beat: the face swells very slightly just before it
+   hands over to the tick. view-box, so it scales about the drawing's own
+   centre rather than a bounding box that grows as strokes draw on. */
+.face {
+  transform-box: view-box;
+  transform-origin: center;
+  animation: recognise var(--loop) linear infinite;
+}
+
+/* Each keyframe ends fully faded, and the next cycle starts back at
+   dashoffset 1 — nothing is visible across the wrap, so the loop has no
+   pop even though opacity jumps back to 1. */
+@keyframes draw-frame {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  13% { stroke-dashoffset: 0; opacity: 1; }
+  88% { stroke-dashoffset: 0; opacity: 1; }
+  97%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes draw-face {
+  0%, 12% { stroke-dashoffset: 1; opacity: 1; }
+  27% { stroke-dashoffset: 0; opacity: 1; }
+  46% { stroke-dashoffset: 0; opacity: 1; }
+  53%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes draw-check {
+  0%, 50% { stroke-dashoffset: 1; opacity: 1; }
+  64% { stroke-dashoffset: 0; opacity: 1; }
+  88% { stroke-dashoffset: 0; opacity: 1; }
+  97%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes recognise {
+  0%, 30% { transform: scale(1); }
+  36% { transform: scale(1.05); }
+  44%, 100% { transform: scale(1); }
+}
+
+.caption {
+  font-family: var(--hand);
+  font-size: 1.02rem;
+  line-height: 1.1;
+  color: var(--ink-light);
+  transform: rotate(1.4deg);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .caption { text-align: left; }
+}
+
+/*
+ * Motion off: no loop at all. Settle on the drawn face rather than the
+ * tick — the face is the thing that says "Face ID", and a lone green
+ * check with no preceding scan reads as an unrelated success badge.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .frame .stroke,
+  .face,
+  .face .stroke,
+  .check {
+    animation: none;
+  }
+  .frame .stroke,
+  .face .stroke {
+    stroke-dashoffset: 0;
+  }
+  .check {
+    display: none;
+  }
+}
