@@ -66,6 +66,23 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
     if (!padState.flipped) setContentVisible(false);
   }, [padState.flipped]);
 
+  // Scrolling all the way past the pad without ever clicking "Turn the
+  // page" is a real path (confirmed live: scrolling straight down with
+  // a mouse wheel, never clicking) — footerVisible correctly fades the
+  // pad out once the footer is genuinely on screen, but contentVisible
+  // only ever becomes true via an explicit flip/skip, so without this
+  // the visitor was left looking at empty space where the notebook
+  // should be: pad gone, content still permanently invisible. This
+  // reveals it in that case too, but doesn't scroll or move focus —
+  // the visitor already scrolled exactly where they meant to go; only
+  // visibility needs to catch up, not the reverse.
+  useEffect(() => {
+    if (!footerVisible || padState.flipped) return;
+    dispatch({ type: "SKIP_TO_REVEALED" });
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setContentVisible(true);
+  }, [footerVisible, padState.flipped]);
+
   // Closing the pad only resets coverOpen/flipped in the reducer —
   // pageTargets is deliberately left untouched there. This effect plays
   // the actual closing sequence, mirroring flip()'s opening sequence in

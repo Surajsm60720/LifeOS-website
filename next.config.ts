@@ -7,6 +7,15 @@ import type { NextConfig } from "next";
 // the R3F/Three.js canvas needs no worker or wasm allowance, and the
 // only cross-origin reference anywhere in the codebase is a plain
 // <a href> to GitHub, which CSP doesn't govern.
+// `next dev`'s React runtime calls eval() itself for dev-only debugging
+// features (reconstructing component stacks, Fast Refresh) — confirmed
+// live: script-src without 'unsafe-eval' left Next's own dev overlay
+// reporting "eval() is not supported in this environment" against this
+// exact CSP. React never uses eval() in a production build, so this
+// stays scoped to dev only rather than weakening the policy that
+// actually ships.
+const isDev = process.env.NODE_ENV !== "production";
+
 const csp = [
   "default-src 'self'",
   // 'unsafe-inline' is here for Next's own inline hydration/RSC
@@ -20,7 +29,7 @@ const csp = [
   // dangerouslySetInnerHTML anywhere, no user input ever rendered as
   // HTML). The other directives below still do real work: no framing,
   // no plugin objects, no unexpected outbound connections.
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   // Inline `style` attributes are used throughout (per-card accent
   // colors, animation custom properties) — same reasoning as above.
   "style-src 'self' 'unsafe-inline'",
