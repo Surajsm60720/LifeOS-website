@@ -1,5 +1,12 @@
 import styles from "./SketchSplitReceipt.module.css";
 
+// The total is derived, not a third hardcoded number sitting next to
+// the two line items — a typo'd literal here is exactly the "$18 + $24
+// = $62" bug a reader would notice immediately and read as the app
+// itself being unable to add.
+const LINE_ITEMS = [18, 24];
+const TOTAL = LINE_ITEMS.reduce((sum, amount) => sum + amount, 0);
+
 /**
  * Real line-item amounts and a subtotal rule above the split, rather
  * than stand-in squiggles — "split the evening" reads as an actual
@@ -11,15 +18,15 @@ export function SketchSplitReceipt({ caption }: { caption: string }) {
       <svg className={styles.glyph} viewBox="0 0 120 150" fill="none">
         <rect className={styles.paper} x="20" y="14" width="80" height="92" rx="6" strokeWidth="2.4" />
         <text className={`${styles.amount} ${styles.line1}`} x="30" y="42">
-          $18
+          ${LINE_ITEMS[0]}
         </text>
         <text className={`${styles.amount} ${styles.line2}`} x="30" y="60">
-          $24
+          ${LINE_ITEMS[1]}
         </text>
         <g className={styles.totalGroup}>
           <line className={styles.rule} x1="30" y1="70" x2="90" y2="70" strokeWidth="1.6" />
           <text className={styles.total} x="30" y="93">
-            $62
+            ${TOTAL}
           </text>
         </g>
         <path
