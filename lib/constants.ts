@@ -14,6 +14,23 @@ export const COVER_CLOSE_THRESHOLD = 0.78;
 
 export const PAGE_COUNT = 4;
 export const PAGE_FLIP_STAGGER_MS = 135;
+/** How long one page's spring takes to swing over and stop wobbling (see lib/page-flex.ts). */
+export const PAGE_SETTLE_MS = 420;
+/** How long until a released page has swung past edge-on and out of frame. */
+export const PAGE_CLEAR_MS = 240;
+/**
+ * Hold the cover open this long when closing: every page must be back
+ * down AND done wobbling before the cover drops over them, or the cover
+ * hides the tail of the animation.
+ */
+export const PAGE_CLOSE_HOLD_MS = PAGE_COUNT * PAGE_FLIP_STAGGER_MS + PAGE_SETTLE_MS;
+/**
+ * Crossfade to content this long after the flip starts. Shorter than the
+ * close hold on purpose — opening only needs the pages *out of sight*,
+ * not fully at rest, and waiting for the settle leaves the viewer staring
+ * at a bare board for a third of a second.
+ */
+export const PAGE_REVEAL_MS = PAGE_COUNT * PAGE_FLIP_STAGGER_MS + PAGE_CLEAR_MS;
 export const COVER_OPEN_GATE_DELAY_MS = 420;
 
 export const MOTE_COUNT_HIGH = 140;

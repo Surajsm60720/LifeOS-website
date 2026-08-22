@@ -4,6 +4,17 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { PAGE_COUNT } from "@/lib/constants";
+import {
+  edgePresence,
+  flexLimits,
+  flexOffset,
+  softClip,
+  stepEnergy,
+  stepSpring,
+  SPRING_DAMPING,
+  SPRING_STIFFNESS,
+  type SpringState,
+} from "@/lib/page-flex";
 
 const W = 3.05;
 const H = 3.85;
@@ -14,40 +25,40 @@ const PAGE_H = H - 0.62;
 // these are the site's own invented page material, and the site is
 // dark-theme only with no light surfaces, full stop.
 const SHADES = [0x28282c, 0x2c2c30, 0x252529, 0x302f34];
-const DAMPING = 0.1;
-const MAX_ROTATION = Math.PI * 0.97; // matches PAGE_OPEN_ANGLE's magnitude in lib/pad-state.ts
-const WIDTH_SEGMENTS = 7;
-const HEIGHT_SEGMENTS = 20;
-// A single smooth arc read as "stiff plastic bending," not paper — real
-// paper flutters: a big primary bow, plus a cross-width ripple that's
-// most active while actually turning, plus a small continuous idle wave
-// so it's never perfectly flat even at rest.
-const MAX_CURL = 0.5; // ceiling: world units of primary bow at the free edge, once safely past edge-on
-const RIPPLE_AMPLITUDE = 0.15; // ceiling, same story as MAX_CURL
-const RIPPLE_FREQUENCY = 2.4;
-const IDLE_AMPLITUDE = 0.02;
-const IDLE_FREQUENCY = 1.6;
-// Cover's hinge sits at world Z 0.115 (Cover.tsx). A vertex's curl is an
-// offset along the mesh's local Z, which projects toward the camera/cover
-// by roughly cos(rotation) — near-total near closed, near-zero once edge-on.
-// A hard on/off gate at 90° reads as "dead, then suddenly alive," which is
-// its own kind of stiff. Instead, cap each effect's *raw* amplitude so its
-// worst-case projection (amplitude * cos(rotation)) never exceeds a fixed
-// safe margin, at every rotation angle — small-but-nonzero flutter from the
-// very start of the flip, growing smoothly as cos(rotation) shrinks, and
-// reaching full ceiling amplitude once the page is safely near edge-on.
-const SAFE_MARGIN_CURL = 0.055;
-const SAFE_MARGIN_RIPPLE = 0.02;
+const WIDTH_SEGMENTS = 9;
+const HEIGHT_SEGMENTS = 24;
+
+const HINGE_Y = H / 2 - 0.3;
+/** Where each sheet rests in the stack; index 0 is the topmost. */
+const PAGE_Z = (i: number) => 0.02 + (PAGE_COUNT - 1 - i) * 0.022;
+/** Cover.tsx hinges its plane at this depth; Pad.tsx's board box fronts here. */
+const COVER_Z = 0.115;
+const BOARD_FRONT_Z = -0.09 + 0.16 / 2;
+const BOARD_TOP_Y = H / 2;
+/** Blend width for the board's top edge, so its limit fades in rather than popping. */
+const BOARD_EDGE_BAND = 0.15;
+
+/** Longest frame the spring integrator is asked to swallow, in seconds. */
+const MAX_STEP = 1 / 30;
 
 type PagesProps = {
   /** Current per-page rotation targets (radians), updated externally by the pad-state reducer. */
   targetsRef: React.RefObject<number[]>;
-  /** When true (prefers-reduced-motion), snap instead of damp. */
+  /**
+   * The cover's hinge, shared from Pad. Read to know whether the cover is
+   * actually in the way this frame — with it open (which it always is by
+   * the time pages move) the pages are free to flex as far as they like.
+   */
+  coverHingeRef: React.RefObject<THREE.Object3D | null>;
+  /** When true (prefers-reduced-motion), snap instead of animating. */
   reduced: boolean;
 };
 
-export function Pages({ targetsRef, reduced }: PagesProps) {
+export function Pages({ targetsRef, coverHingeRef, reduced }: PagesProps) {
   const hingeRefs = useRef<(THREE.Object3D | null)[]>([]);
+  // Per-page spring + flutter state, persisted across frames.
+  const springs = useRef<SpringState[]>(Array.from({ length: PAGE_COUNT }, () => ({ angle: 0, velocity: 0 })));
+  const energies = useRef<number[]>(new Array(PAGE_COUNT).fill(0));
 
   const materials = useMemo(
     () => SHADES.map((shade) => new THREE.MeshStandardMaterial({ color: shade, roughness: 0.7, side: THREE.DoubleSide })),
@@ -64,48 +75,72 @@ export function Pages({ targetsRef, reduced }: PagesProps) {
     []
   );
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     const time = clock.getElapsedTime();
+    // Clamped: a stalled tab or a GC pause hands back a huge delta, and a
+    // stiff spring integrated over it explodes.
+    const dt = Math.min(delta, MAX_STEP);
     const targets = targetsRef.current;
+
+    const coverRotation = coverHingeRef.current?.rotation.x ?? 0;
+    const coverPresence = Math.max(0, Math.cos(coverRotation));
+
     hingeRefs.current.forEach((hinge, i) => {
       if (!hinge) return;
       const target = targets[i] ?? 0;
-      hinge.rotation.x = reduced ? target : hinge.rotation.x + (target - hinge.rotation.x) * DAMPING;
 
-      if (reduced) return;
+      if (reduced) {
+        hinge.rotation.x = target;
+        springs.current[i] = { angle: target, velocity: 0 };
+        return;
+      }
+
+      // Each sheet is given slightly different stiffness/damping so the
+      // stack never swings as one slab even where the stagger overlaps.
+      const spring = stepSpring(
+        springs.current[i],
+        target,
+        dt,
+        SPRING_STIFFNESS * (1 - i * 0.05),
+        SPRING_DAMPING * (1 - i * 0.04)
+      );
+      springs.current[i] = spring;
+      hinge.rotation.x = spring.angle;
+
+      const energy = stepEnergy(energies.current[i], spring.velocity, dt);
+      energies.current[i] = energy;
 
       const geometry = geometries[i];
       const position = geometry.attributes.position;
-      const progress = Math.min(1, Math.abs(hinge.rotation.x) / MAX_ROTATION);
-      const flipShape = Math.sin(progress * Math.PI); // 0 at rest, 1 at mid-flip
-
-      const cosR = Math.abs(Math.cos(hinge.rotation.x));
-      const curlCap = cosR > 1e-3 ? Math.min(MAX_CURL, SAFE_MARGIN_CURL / cosR) : MAX_CURL;
-      const rippleCap = cosR > 1e-3 ? Math.min(RIPPLE_AMPLITUDE, SAFE_MARGIN_RIPPLE / cosR) : RIPPLE_AMPLITUDE;
-
-      const primaryCurl = flipShape * curlCap;
-      // No floor here — ripple must reach exactly 0 at rest, same bug
-      // class as the clipping this whole cap scheme guards against (a
-      // "never quite zero" strength was enough to bow a closed page's
-      // free edge in front of the cover).
-      const rippleStrength = flipShape * flipShape * rippleCap;
-      const phase = time * 2.2 + i * 1.7;
+      const sinRotation = Math.sin(spring.angle);
+      const cosRotation = Math.cos(spring.angle);
+      const pageZ = PAGE_Z(i);
+      const phase = i * 1.7;
 
       for (let v = 0; v < position.count; v++) {
-        const localX = position.getX(v);
-        const localY = position.getY(v); // -PAGE_H/2 (free edge) .. +PAGE_H/2 (hinge edge)
-        const t = (PAGE_H / 2 - localY) / PAGE_H; // 0 at hinge edge, 1 at free edge
-        const tFalloff = Math.pow(t, 1.3);
+        const localY = position.getY(v); // +PAGE_H/2 at the hinge edge, -PAGE_H/2 at the free edge
+        const t = (PAGE_H / 2 - localY) / PAGE_H; // 0 at hinge, 1 at free edge
+        const xNorm = position.getX(v) / (PAGE_W / 2);
+        const armLength = t * PAGE_H;
 
-        const bow = primaryCurl * tFalloff;
-        const ripple = Math.sin(localX * RIPPLE_FREQUENCY + phase) * rippleStrength * tFalloff;
-        // Idle wave is small enough (0.02 peak) to stay within the combined
-        // safety budget unconditionally, even at rotation 0 — it's the
-        // "never perfectly flat" touch, not part of the flip flourish, so
-        // it isn't capped like curl/ripple above.
-        const idle = Math.sin(t * Math.PI * 1.4 + time * IDLE_FREQUENCY + i * 0.9) * IDLE_AMPLITUDE * t;
+        const raw = flexOffset({ t, xNorm, rotation: spring.angle, angularVelocity: spring.velocity, energy, time, phase });
 
-        position.setZ(v, bow + ripple + idle);
+        // Where this vertex already sits, rigidly, before flexing — the
+        // obstacle gaps are measured from here, not from the page's
+        // resting depth, so a free edge that has swung out in front of
+        // the pad isn't limited as though the board were still behind it.
+        const vertexZ = pageZ - armLength * sinRotation;
+        const vertexY = HINGE_Y - armLength * cosRotation;
+        const { forward, backward } = flexLimits({
+          vertexZ,
+          coverZ: COVER_Z,
+          boardFrontZ: BOARD_FRONT_Z,
+          cosRotation,
+          coverPresence,
+          boardPresence: edgePresence(vertexY - BOARD_TOP_Y, BOARD_EDGE_BAND),
+        });
+
+        position.setZ(v, softClip(raw, forward, backward));
       }
       position.needsUpdate = true;
       geometry.computeVertexNormals();
@@ -120,7 +155,7 @@ export function Pages({ targetsRef, reduced }: PagesProps) {
           ref={(el) => {
             hingeRefs.current[i] = el;
           }}
-          position={[0, H / 2 - 0.3, 0.02 + (3 - i) * 0.022]}
+          position={[0, HINGE_Y, PAGE_Z(i)]}
         >
           <mesh geometry={geometries[i]} material={materials[i]} position={[0, -PAGE_H / 2, 0]} />
         </object3D>

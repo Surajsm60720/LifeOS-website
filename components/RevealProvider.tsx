@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useReducer, useRef, 
 import { padStateReducer, initialPadState, PAGE_OPEN_ANGLE, type PadState } from "@/lib/pad-state";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { focusFeatures } from "@/lib/focus-features";
-import { PAGE_FLIP_STAGGER_MS, PAGE_COUNT } from "@/lib/constants";
+import { PAGE_FLIP_STAGGER_MS, PAGE_CLOSE_HOLD_MS, PAGE_REVEAL_MS, PAGE_COUNT } from "@/lib/constants";
 
 type RevealContextValue = {
   padState: PadState;
@@ -75,7 +75,11 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
         const delay = reduced ? 0 : i * PAGE_FLIP_STAGGER_MS;
         setTimeout(() => dispatch({ type: "SET_PAGE_TARGET", index: pageIndex, value: 0 }), delay);
       }
-      const staggerDuration = reduced ? 0 : PAGE_COUNT * PAGE_FLIP_STAGGER_MS;
+      // The full sequence, not just the stagger: each page now springs
+      // shut over PAGE_SETTLE_MS after its target flips, so holding only
+      // for the stagger would drop the cover over the last page
+      // mid-swing — the very thing this hold exists to prevent.
+      const staggerDuration = reduced ? 0 : PAGE_CLOSE_HOLD_MS;
       const timer = setTimeout(() => setVisualCoverOpen(false), staggerDuration);
       wasFlippedRef.current = padState.flipped;
       return () => clearTimeout(timer);
@@ -99,11 +103,10 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
       const delay = reduced ? 0 : i * PAGE_FLIP_STAGGER_MS;
       setTimeout(() => dispatch({ type: "SET_PAGE_TARGET", index: i, value: PAGE_OPEN_ANGLE }), delay);
     }
-    // Don't crossfade to content until the page-flip animation has
-    // actually finished playing — this is the same delay used for
-    // focus, just also gating the visual handoff now instead of firing
-    // it at click time and racing the still-mid-flip 3D animation.
-    const revealDelay = reduced ? 0 : PAGE_COUNT * PAGE_FLIP_STAGGER_MS + 200;
+    // Don't crossfade to content until the last page has actually swung
+    // out of frame, rather than firing at click time and racing the
+    // still-mid-flip 3D animation. Same delay gates the focus move.
+    const revealDelay = reduced ? 0 : PAGE_REVEAL_MS;
     setTimeout(() => {
       setContentVisible(true);
       // "instant", not "auto" — the page sets `scroll-behavior: smooth`

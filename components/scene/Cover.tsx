@@ -4,10 +4,17 @@ import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
+import { stepSpring, type SpringState } from "@/lib/page-flex";
 
 const W = 3.05;
 const H = 3.85;
-const DAMPING = 0.11;
+// Same spring integrator as the pages, tuned heavier: the cover is a
+// stiff board, so it's near-critically damped and swings once without
+// the paper's overshoot. A plain per-frame lerp (what this replaced)
+// also ran at double speed on a 120Hz display.
+const SPRING_STIFFNESS = 42;
+const SPRING_DAMPING = 11.5;
+const MAX_STEP = 1 / 30;
 
 type CoverProps = {
   /** Current target rotation (radians), updated externally by the pad-state reducer. */
@@ -27,12 +34,19 @@ export function Cover({ targetRef, reduced, onLoaded, hingeRef }: CoverProps) {
   texture.colorSpace = THREE.SRGBColorSpace;
 
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+  const spring = useRef<SpringState>({ angle: 0, velocity: 0 });
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const hinge = hingeRef.current;
     if (!hinge) return;
     const target = targetRef.current ?? 0;
-    hinge.rotation.x = reduced ? target : hinge.rotation.x + (target - hinge.rotation.x) * DAMPING;
+    if (reduced) {
+      hinge.rotation.x = target;
+      spring.current = { angle: target, velocity: 0 };
+      return;
+    }
+    spring.current = stepSpring(spring.current, target, Math.min(delta, MAX_STEP), SPRING_STIFFNESS, SPRING_DAMPING);
+    hinge.rotation.x = spring.current.angle;
   });
 
   return (

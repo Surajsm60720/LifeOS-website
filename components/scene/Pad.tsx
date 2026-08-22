@@ -76,7 +76,7 @@ export function Pad({
       }}
     >
       <mesh geometry={boardGeometry} material={boardMaterial} position={[0, 0, -0.09]} />
-      <Pages targetsRef={pageTargetsRef} reduced={reduced} />
+      <Pages targetsRef={pageTargetsRef} coverHingeRef={coverHingeRef} reduced={reduced} />
       <Cover targetRef={coverTargetRef} reduced={reduced} onLoaded={onCoverLoaded} hingeRef={coverHingeRef} />
       <Rings />
     </group>
