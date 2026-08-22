@@ -1,33 +1,27 @@
 import styles from "./SketchDynamicIsland.module.css";
 
 /**
- * Same three-stage animation as before — compact, glance, press-and-hold
- * full card — refined against how the real thing is actually built:
- *
- *  - the Island is near-black, not card-gray; it reads as a cutout in
- *    the display, not a UI panel;
- *  - the camera sits right-of-centre, not centred — the earpiece
- *    pushes it there on the real hardware — and never moves or hides,
- *    because it's physically always there regardless of what content
- *    is showing around it;
- *  - the leading glyph is asymmetric (one icon, not two mirrored ones)
- *    and persists from the glance stage straight into the expanded
- *    header, the way a real Live Activity's leading icon doesn't
- *    disappear when you press and hold — only the trailing count gets
- *    replaced, by the row list, once expanded.
+ * Two states, matching how a real Live Activity actually behaves — not
+ * three. A running activity's compact presentation already shows
+ * leading content, the camera, and trailing content together as one
+ * fixed-size pill; there's no intermediate "narrower pill with nothing
+ * on it" a real Live Activity ever passes through on a loop. The one
+ * real, dramatic resize is compact -> expanded on press-and-hold, which
+ * grows both wider and taller into a card — that's the only shape
+ * change here.
  */
 export function SketchDynamicIsland({ caption }: { caption: string }) {
   return (
     <figure className={styles.sketch} aria-hidden="true">
       <svg className={styles.glyph} viewBox="0 0 200 170" fill="none">
-        <rect className={styles.pill} x="82" y="14" width="36" height="26" rx="13" />
+        <rect className={styles.pill} x="64" y="14" width="72" height="26" rx="13" />
 
         <circle className={styles.sensor} cx="108" cy="27" r="4" />
 
         <g className={styles.leadingIcon} strokeWidth="1.8">
-          <line x1="58" y1="23" x2="70" y2="23" />
-          <line x1="58" y1="27" x2="68" y2="27" />
-          <line x1="58" y1="31" x2="70" y2="31" />
+          <line x1="74" y1="23" x2="86" y2="23" />
+          <line x1="74" y1="27" x2="84" y2="27" />
+          <line x1="74" y1="31" x2="86" y2="31" />
         </g>
 
         <text className={styles.count} x="122" y="33">

@@ -14,63 +14,59 @@
 }
 
 /*
- * One shape animates through all three real iOS stages — compact,
- * glance (wider only), and the press-and-hold full card (wider AND
- * taller) — rather than swapping between separate elements. x/width
- * shrink together to keep it centered as it grows; rx eases from a
- * stadium pill down to a card radius once it's tall enough that a
- * stadium shape would look wrong.
+ * One shape, two real sizes: the resting compact pill (already showing
+ * its content, not an empty narrower stand-in) and the press-and-hold
+ * expanded card — wider AND taller, unlike the compact-to-compact
+ * width-only step this replaced. rx eases from a stadium at compact
+ * height down to a card radius once it's tall enough that a stadium
+ * would look wrong, the same way a real expanded Live Activity is a
+ * rounded rectangle, not a stretched-out stadium.
  *
- * Fill is --void, not --elevated — the real Island is near-black, a
- * cutout in the display rather than a UI panel, several shades darker
- * than any card on this page. The pen outline stays so it still reads
- * as drawn, the same convention as every other sketch on the site.
+ * Fill matches every other filled shape on this page (SketchSwipeRow's
+ * row, SketchSplitReceipt's paper) — the page's own --elevated, not a
+ * near-black cutout. Chasing real hardware color here read as a
+ * different, inconsistent surface next to every other sketch on the
+ * same page; the pen outline is what says "this is drawn," not the fill.
  */
 .pill {
-  fill: var(--void);
+  fill: var(--elevated);
   stroke: var(--ink-light);
   stroke-width: 2.4;
-  animation: morph-pill 7s linear infinite;
+  animation: morph-pill 6s linear infinite;
 }
 
-/* The camera: fixed position, fixed visibility, in every stage. On the
-   real hardware it's right-of-centre (the earpiece speaker occupies the
-   left side) and it never moves or disappears just because content is
-   showing around it — so unlike everything else here, it isn't
-   animated at all. */
+/* The camera: fixed position, always visible, in both states. On the
+   real hardware it sits right-of-centre (the earpiece speaker occupies
+   the left side) and it doesn't move or disappear just because content
+   is showing around it. */
 .sensor { fill: var(--ink-light); }
 
-/* The leading glyph persists from the glance stage into the expanded
-   header — a real Live Activity's leading icon doesn't vanish on press
-   and hold, only the trailing content past the camera gets replaced. */
+/* The leading glyph is part of the resting compact pill from the
+   start — real Live Activities don't animate it in — and it persists
+   straight into the expanded header, unbroken. Only the trailing count
+   is compact-only, replaced by the row list once expanded. */
 .leadingIcon {
   stroke: var(--ink-light);
   stroke-linecap: round;
-  opacity: 0;
-  animation: show-leading 7s linear infinite;
 }
 
-/* Trailing content, glance stage only — swapped out for the row list
-   once expanded, the same way a compact Live Activity's count gives
-   way to full detail on long-press. */
 .count {
   font-family: var(--hand);
   font-size: 16px;
   fill: var(--violet);
-  opacity: 0;
-  animation: show-count 7s linear infinite;
+  animation: show-count 6s linear infinite;
 }
 
 .divider {
   stroke: var(--stroke-2);
   opacity: 0;
-  animation: show-divider 7s linear infinite;
+  animation: show-divider 6s linear infinite;
 }
 
 .row { opacity: 0; }
-.row1 { animation: show-row1 7s linear infinite; }
-.row2 { animation: show-row2 7s linear infinite; }
-.row3 { animation: show-row3 7s linear infinite; }
+.row1 { animation: show-row1 6s linear infinite; }
+.row2 { animation: show-row2 6s linear infinite; }
+.row3 { animation: show-row3 6s linear infinite; }
 
 .row line { stroke-linecap: round; }
 .dotIrl { fill: var(--irl); }
@@ -80,62 +76,50 @@
 .time { stroke: var(--stroke-2); }
 
 @keyframes morph-pill {
-  0%, 8% { x: 82px; width: 36px; height: 26px; rx: 13px; }
-  20% { x: 40px; width: 120px; height: 26px; rx: 13px; }
-  36% { x: 40px; width: 120px; height: 26px; rx: 13px; }
-  50% { x: 20px; width: 160px; height: 140px; rx: 24px; }
-  74% { x: 20px; width: 160px; height: 140px; rx: 24px; }
-  88%, 100% { x: 82px; width: 36px; height: 26px; rx: 13px; }
-}
-
-/* From the glance stage's arrival straight through the full card's
-   entire hold — one continuous presence spanning two stages, not two
-   separate pop-ins. */
-@keyframes show-leading {
-  0%, 12% { opacity: 0; }
-  18% { opacity: 1; }
-  74% { opacity: 1; }
-  84%, 100% { opacity: 0; }
+  0%, 10% { x: 64px; width: 72px; height: 26px; rx: 13px; }
+  30% { x: 20px; width: 160px; height: 140px; rx: 24px; }
+  62% { x: 20px; width: 160px; height: 140px; rx: 24px; }
+  82%, 100% { x: 64px; width: 72px; height: 26px; rx: 13px; }
 }
 
 @keyframes show-count {
-  0%, 12% { opacity: 0; }
-  18% { opacity: 1; }
-  34% { opacity: 1; }
-  44%, 100% { opacity: 0; }
+  0%, 8% { opacity: 1; }
+  16% { opacity: 0; }
+  78% { opacity: 0; }
+  86%, 100% { opacity: 1; }
 }
 
 @keyframes show-divider {
-  0%, 44% { opacity: 0; }
-  50% { opacity: 1; }
-  74% { opacity: 1; }
-  82%, 100% { opacity: 0; }
+  0%, 20% { opacity: 0; }
+  28% { opacity: 1; }
+  64% { opacity: 1; }
+  72%, 100% { opacity: 0; }
 }
 
 @keyframes show-row1 {
-  0%, 44% { opacity: 0; }
-  50% { opacity: 1; }
-  70% { opacity: 1; }
-  78%, 100% { opacity: 0; }
+  0%, 20% { opacity: 0; }
+  30% { opacity: 1; }
+  58% { opacity: 1; }
+  68%, 100% { opacity: 0; }
 }
 
 @keyframes show-row2 {
-  0%, 48% { opacity: 0; }
+  0%, 24% { opacity: 0; }
+  34% { opacity: 1; }
   54% { opacity: 1; }
-  66% { opacity: 1; }
-  74%, 100% { opacity: 0; }
+  64%, 100% { opacity: 0; }
 }
 
 @keyframes show-row3 {
-  0%, 52% { opacity: 0; }
-  58% { opacity: 1; }
-  62% { opacity: 1; }
-  70%, 100% { opacity: 0; }
+  0%, 28% { opacity: 0; }
+  38% { opacity: 1; }
+  50% { opacity: 1; }
+  60%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* Settle on the fully expanded, most informative stage. */
   .pill { animation: none; x: 20px; width: 160px; height: 140px; rx: 24px; }
-  .leadingIcon, .divider, .row { animation: none; opacity: 1; }
+  .divider, .row { animation: none; opacity: 1; }
   .count { animation: none; opacity: 0; }
 }
