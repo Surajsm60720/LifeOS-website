@@ -19,7 +19,18 @@
 .main {
   position: fixed;
   inset: 0;
-  z-index: 2;
+  /* Higher than Gate's 3 and Footer's 2 — confirmed from a screen
+     recording that both were bleeding through simultaneously.
+     visibility:hidden already keeps this from painting at all when not
+     shown, so there's no downside to always outranking them: Footer
+     shares z-index 2 and, being later in the DOM, paints on top of
+     anything else at that same level regardless of opacity, and Gate
+     can be mid-fade-transition at exactly the moment this becomes
+     visible. An opaque background handles the other half — the
+     transparent margins around the centered card were letting whatever
+     sits further behind (the pad's own Scene) show through too. */
+  z-index: 10;
+  background: var(--canvas);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -86,7 +86,20 @@ export function MainReveal() {
   useEffect(() => {
     const el = runwayRef.current;
     if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0 });
+    // rootMargin shrinks the effective viewport used for this test —
+    // a bare threshold:0 counts *any* overlap at all, which stays true
+    // for up to a full extra viewport-height of scroll distance past
+    // the placeholder's own edge on either side (its 100dvh height
+    // plus the real viewport's own 100dvh both have to clear before
+    // "zero overlap" is reached). On the way out toward the footer,
+    // that read as the notebook getting stuck on screen well after the
+    // visitor had already scrolled on. This keeps enough margin that a
+    // fast incoming scroll still reliably engages, while cutting the
+    // worst-case lingering roughly in half.
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      threshold: 0,
+      rootMargin: "-15% 0px -15% 0px",
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
