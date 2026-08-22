@@ -1,27 +1,27 @@
 import styles from "./SketchDynamicIsland.module.css";
 
 /**
- * Two states, matching how a real Live Activity actually behaves — not
- * three. A running activity's compact presentation already shows
- * leading content, the camera, and trailing content together as one
- * fixed-size pill; there's no intermediate "narrower pill with nothing
- * on it" a real Live Activity ever passes through on a loop. The one
- * real, dramatic resize is compact -> expanded on press-and-hold, which
- * grows both wider and taller into a card — that's the only shape
- * change here.
+ * Three stages: idle (just the two sensor cutouts — the camera and the
+ * smaller proximity/light sensor beside it, the real hardware layout of
+ * a narrow bare pill with no Live Activity content yet), then a
+ * horizontal-only widen as the activity starts and its leading icon and
+ * trailing count populate, then the press-and-hold expand — wider AND
+ * taller this time — into the full card. The two sensors are physical:
+ * fixed position, always visible, unaffected by any of it.
  */
 export function SketchDynamicIsland({ caption }: { caption: string }) {
   return (
     <figure className={styles.sketch} aria-hidden="true">
       <svg className={styles.glyph} viewBox="0 0 200 170" fill="none">
-        <rect className={styles.pill} x="64" y="14" width="72" height="26" rx="13" />
+        <rect className={styles.pill} x="82" y="14" width="36" height="26" rx="13" />
 
-        <circle className={styles.sensor} cx="108" cy="27" r="4" />
+        <circle className={styles.sensor} cx="104" cy="27" r="4" />
+        <ellipse className={styles.sensor} cx="91" cy="27" rx="3" ry="2.4" />
 
         <g className={styles.leadingIcon} strokeWidth="1.8">
-          <line x1="74" y1="23" x2="86" y2="23" />
-          <line x1="74" y1="27" x2="84" y2="27" />
-          <line x1="74" y1="31" x2="86" y2="31" />
+          <line x1="58" y1="23" x2="70" y2="23" />
+          <line x1="58" y1="27" x2="68" y2="27" />
+          <line x1="58" y1="31" x2="70" y2="31" />
         </g>
 
         <text className={styles.count} x="122" y="33">

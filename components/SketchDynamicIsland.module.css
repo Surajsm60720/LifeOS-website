@@ -14,59 +14,60 @@
 }
 
 /*
- * One shape, two real sizes: the resting compact pill (already showing
- * its content, not an empty narrower stand-in) and the press-and-hold
- * expanded card — wider AND taller, unlike the compact-to-compact
- * width-only step this replaced. rx eases from a stadium at compact
- * height down to a card radius once it's tall enough that a stadium
- * would look wrong, the same way a real expanded Live Activity is a
- * rounded rectangle, not a stretched-out stadium.
+ * One shape through all three real states: idle (bare, narrow), a
+ * horizontal-only widen once the activity starts and populates its
+ * content, then the press-and-hold expand — wider AND taller — into
+ * the full card. rx eases from a stadium down to a card radius once
+ * it's tall enough that a stadium would look wrong.
  *
  * Fill matches every other filled shape on this page (SketchSwipeRow's
- * row, SketchSplitReceipt's paper) — the page's own --elevated, not a
- * near-black cutout. Chasing real hardware color here read as a
- * different, inconsistent surface next to every other sketch on the
- * same page; the pen outline is what says "this is drawn," not the fill.
+ * row, SketchSplitReceipt's paper) — the page's own --elevated, not the
+ * real hardware's near-black. The pen outline is what says "this is
+ * drawn," not the fill color, and matching real hardware black fought
+ * the site's one-hand, one-hue rule across all fifteen sketches.
  */
 .pill {
   fill: var(--elevated);
   stroke: var(--ink-light);
   stroke-width: 2.4;
-  animation: morph-pill 6s linear infinite;
+  animation: morph-pill 7s linear infinite;
 }
 
-/* The camera: fixed position, always visible, in both states. On the
-   real hardware it sits right-of-centre (the earpiece speaker occupies
-   the left side) and it doesn't move or disappear just because content
-   is showing around it. */
+/* The two sensor cutouts — camera and the smaller proximity/light
+   sensor beside it. Fixed position, always visible, in every stage:
+   physically always there regardless of what content is showing
+   around them, so unlike everything else here neither is animated. */
 .sensor { fill: var(--ink-light); }
 
-/* The leading glyph is part of the resting compact pill from the
-   start — real Live Activities don't animate it in — and it persists
-   straight into the expanded header, unbroken. Only the trailing count
-   is compact-only, replaced by the row list once expanded. */
+/* Hidden at rest — a bare idle pill shows only its sensors — appears
+   as the activity starts and the pill widens, then persists straight
+   into the expanded header. Only the trailing count is glance-only,
+   replaced by the row list once expanded. */
 .leadingIcon {
   stroke: var(--ink-light);
   stroke-linecap: round;
+  opacity: 0;
+  animation: show-leading 7s linear infinite;
 }
 
 .count {
   font-family: var(--hand);
   font-size: 16px;
   fill: var(--violet);
-  animation: show-count 6s linear infinite;
+  opacity: 0;
+  animation: show-count 7s linear infinite;
 }
 
 .divider {
   stroke: var(--stroke-2);
   opacity: 0;
-  animation: show-divider 6s linear infinite;
+  animation: show-divider 7s linear infinite;
 }
 
 .row { opacity: 0; }
-.row1 { animation: show-row1 6s linear infinite; }
-.row2 { animation: show-row2 6s linear infinite; }
-.row3 { animation: show-row3 6s linear infinite; }
+.row1 { animation: show-row1 7s linear infinite; }
+.row2 { animation: show-row2 7s linear infinite; }
+.row3 { animation: show-row3 7s linear infinite; }
 
 .row line { stroke-linecap: round; }
 .dotIrl { fill: var(--irl); }
@@ -76,50 +77,59 @@
 .time { stroke: var(--stroke-2); }
 
 @keyframes morph-pill {
-  0%, 10% { x: 64px; width: 72px; height: 26px; rx: 13px; }
-  30% { x: 20px; width: 160px; height: 140px; rx: 24px; }
-  62% { x: 20px; width: 160px; height: 140px; rx: 24px; }
-  82%, 100% { x: 64px; width: 72px; height: 26px; rx: 13px; }
+  0%, 8% { x: 82px; width: 36px; height: 26px; rx: 13px; }
+  20% { x: 40px; width: 120px; height: 26px; rx: 13px; }
+  36% { x: 40px; width: 120px; height: 26px; rx: 13px; }
+  50% { x: 20px; width: 160px; height: 140px; rx: 24px; }
+  74% { x: 20px; width: 160px; height: 140px; rx: 24px; }
+  88%, 100% { x: 82px; width: 36px; height: 26px; rx: 13px; }
+}
+
+@keyframes show-leading {
+  0%, 12% { opacity: 0; }
+  18% { opacity: 1; }
+  84% { opacity: 1; }
+  90%, 100% { opacity: 0; }
 }
 
 @keyframes show-count {
-  0%, 8% { opacity: 1; }
-  16% { opacity: 0; }
-  78% { opacity: 0; }
-  86%, 100% { opacity: 1; }
+  0%, 12% { opacity: 0; }
+  18% { opacity: 1; }
+  34% { opacity: 1; }
+  44%, 100% { opacity: 0; }
 }
 
 @keyframes show-divider {
-  0%, 20% { opacity: 0; }
-  28% { opacity: 1; }
-  64% { opacity: 1; }
-  72%, 100% { opacity: 0; }
+  0%, 44% { opacity: 0; }
+  50% { opacity: 1; }
+  74% { opacity: 1; }
+  82%, 100% { opacity: 0; }
 }
 
 @keyframes show-row1 {
-  0%, 20% { opacity: 0; }
-  30% { opacity: 1; }
-  58% { opacity: 1; }
-  68%, 100% { opacity: 0; }
+  0%, 44% { opacity: 0; }
+  50% { opacity: 1; }
+  70% { opacity: 1; }
+  78%, 100% { opacity: 0; }
 }
 
 @keyframes show-row2 {
-  0%, 24% { opacity: 0; }
-  34% { opacity: 1; }
+  0%, 48% { opacity: 0; }
   54% { opacity: 1; }
-  64%, 100% { opacity: 0; }
+  66% { opacity: 1; }
+  74%, 100% { opacity: 0; }
 }
 
 @keyframes show-row3 {
-  0%, 28% { opacity: 0; }
-  38% { opacity: 1; }
-  50% { opacity: 1; }
-  60%, 100% { opacity: 0; }
+  0%, 52% { opacity: 0; }
+  58% { opacity: 1; }
+  62% { opacity: 1; }
+  70%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* Settle on the fully expanded, most informative stage. */
   .pill { animation: none; x: 20px; width: 160px; height: 140px; rx: 24px; }
-  .divider, .row { animation: none; opacity: 1; }
+  .leadingIcon, .divider, .row { animation: none; opacity: 1; }
   .count { animation: none; opacity: 0; }
 }
