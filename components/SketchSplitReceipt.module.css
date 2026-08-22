@@ -18,23 +18,27 @@
   fill: var(--elevated);
 }
 
-.line {
-  stroke: var(--ink-light);
-  fill: none;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+.amount {
+  font-family: var(--hand);
+  font-size: 15px;
+  fill: var(--ink-light);
+  opacity: 0;
+  transform-box: fill-box;
 }
-.line1 { animation: draw-line 6s linear infinite; animation-delay: .08s; }
-.line2 { animation: draw-line 6s linear infinite; animation-delay: .18s; }
+.line1 { animation: pop-amount 6s linear infinite; animation-delay: 0s; }
+.line2 { animation: pop-amount 6s linear infinite; animation-delay: .15s; }
 
+.rule { stroke: var(--stroke-2); }
 .total {
-  stroke: var(--gold);
-  fill: none;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: draw-total 6s linear infinite;
+  font-family: var(--hand);
+  font-size: 19px;
+  fill: var(--gold);
+}
+
+.totalGroup {
+  opacity: 0;
+  transform-box: fill-box;
+  animation: pop-total 6s linear infinite;
 }
 
 .connector {
@@ -63,18 +67,18 @@
 .p2 { animation-delay: .08s; }
 .p3 { animation-delay: .16s; }
 
-@keyframes draw-line {
-  0% { stroke-dashoffset: 1; opacity: .6; }
-  20% { stroke-dashoffset: 0; opacity: .6; }
-  80% { stroke-dashoffset: 0; opacity: .6; }
-  92%, 100% { stroke-dashoffset: 0; opacity: 0; }
+@keyframes pop-amount {
+  0%, 16% { opacity: 0; transform: translateY(-4px); }
+  26% { opacity: .85; transform: translateY(0); }
+  80% { opacity: .85; transform: translateY(0); }
+  92%, 100% { opacity: 0; transform: translateY(0); }
 }
 
-@keyframes draw-total {
-  0%, 26% { stroke-dashoffset: 1; opacity: 0; }
-  38% { stroke-dashoffset: 0; opacity: 1; }
-  80% { stroke-dashoffset: 0; opacity: 1; }
-  92%, 100% { opacity: 0; }
+@keyframes pop-total {
+  0%, 26% { opacity: 0; transform: translateY(-4px); }
+  38% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  92%, 100% { opacity: 0; transform: translateY(0); }
 }
 
 @keyframes draw-connector {
@@ -93,9 +97,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .line, .total, .connector { animation: none; stroke-dashoffset: 0; }
-  .line { opacity: .6; }
-  .total { opacity: 1; }
-  .connector { opacity: .5; }
+  .amount { animation: none; opacity: .85; transform: translateY(0); }
+  .totalGroup { animation: none; opacity: 1; transform: translateY(0); }
+  .connector { animation: none; stroke-dashoffset: 0; opacity: .5; }
   .person { animation: none; opacity: 1; transform: scale(1); }
 }

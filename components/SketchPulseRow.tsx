@@ -1,26 +1,33 @@
 import styles from "./SketchPulseRow.module.css";
 
-const POSITIONS = [30, 65, 100, 135, 170];
+const DAY_X = [24, 54, 84, 114, 144, 174, 204];
 
 /**
- * Five dots pulsing in sequence like a metronome — the Games card's own
- * words, "cadence you can actually see", as a literal beat rather than
- * a screenshot of a schedule.
+ * Daily resets ticking off one after another along a week, with a
+ * weekly reset landing on top once the week completes — two different
+ * cadences overlaid on the same timeline, the way the card's own copy
+ * distinguishes "dailies" from "weeklies" rather than treating every
+ * reset as the same beat.
  */
 export function SketchPulseRow({ caption }: { caption: string }) {
   return (
     <figure className={styles.sketch} aria-hidden="true">
-      <svg className={styles.glyph} viewBox="0 0 200 90" fill="none">
-        {POSITIONS.map((x, i) => (
+      <svg className={styles.glyph} viewBox="0 0 228 100" fill="none">
+        <line className={styles.rail} x1="20" y1="70" x2="208" y2="70" strokeWidth="2" />
+        {DAY_X.map((x) => (
+          <line key={x} className={styles.dayTick} x1={x} y1="65" x2={x} y2="75" strokeWidth="1.6" />
+        ))}
+        {DAY_X.map((x, i) => (
           <circle
             key={x}
-            className={styles.dot}
+            className={styles.daily}
             cx={x}
-            cy="45"
-            r="9"
-            style={{ "--delay": `${i * 0.14}s` } as React.CSSProperties}
+            cy="46"
+            r="7"
+            style={{ "--delay": `${i * 0.1}s` } as React.CSSProperties}
           />
         ))}
+        <path className={styles.weekly} d="M204 20L214 30L204 40L194 30Z" />
       </svg>
       <figcaption className={styles.caption}>{caption}</figcaption>
     </figure>

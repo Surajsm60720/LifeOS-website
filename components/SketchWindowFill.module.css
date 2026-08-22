@@ -8,30 +8,51 @@
 
 .glyph {
   width: 100%;
-  max-width: 176px;
-  aspect-ratio: 2 / 1;
+  max-width: 200px;
+  aspect-ratio: 220 / 100;
   overflow: visible;
 }
 
-/* The bracket is the fixed span — it never resizes, only the fill
-   inside it does. That distinction is what separates this from
-   SketchDurationBar's own growing bar, which represents the opposite
-   idea (the total length itself is what's flexible). */
-.bracket { stroke: var(--ink-light); fill: none; stroke-linecap: round; }
+/* Three fixed buckets, always on screen — the tab's own Starting Soon /
+   Active Now / Recently Ended zones. Only the token travelling between
+   them, and the fill inside the middle one, ever move. */
+.zone {
+  stroke: var(--ink-light);
+  stroke-width: 2.2;
+  fill: none;
+}
+.ended { opacity: .35; }
 
-.fill {
+.activeFill {
   fill: var(--mint);
   fill-opacity: .55;
-  animation: fill-window 6s ease-in-out infinite;
+  animation: grow-fill 6s linear infinite;
 }
 
-@keyframes fill-window {
-  0%, 8% { width: 6px; }
-  50% { width: 136px; }
-  74% { width: 136px; }
-  92%, 100% { width: 6px; }
+.token {
+  transform-box: view-box;
+  animation: travel-window 6s linear infinite;
+}
+.token circle { fill: var(--mint); }
+
+@keyframes travel-window {
+  0% { transform: translateX(0); opacity: 0; }
+  6% { opacity: 1; }
+  22% { transform: translateX(67px); }
+  50% { transform: translateX(67px); }
+  68% { transform: translateX(134px); }
+  84% { transform: translateX(134px); opacity: .4; }
+  92%, 100% { transform: translateX(134px); opacity: 0; }
+}
+
+@keyframes grow-fill {
+  0%, 20% { width: 0; }
+  34% { width: 46px; }
+  62% { width: 46px; }
+  70%, 100% { width: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fill { animation: none; width: 136px; }
+  .token { animation: none; transform: translateX(67px); opacity: 1; }
+  .activeFill { animation: none; width: 46px; }
 }

@@ -8,27 +8,53 @@
 
 .glyph {
   width: 100%;
-  max-width: 176px;
-  aspect-ratio: 20 / 9;
+  max-width: 200px;
+  aspect-ratio: 228 / 100;
   overflow: visible;
 }
 
-/* Faster and shorter than the narrative sketches on purpose — a
-   metronome reads as cadence precisely because it's quick and doesn't
-   pause for a story, unlike a one-shot draw-then-hold animation. */
-.dot {
+.rail { stroke: var(--stroke-2); }
+.dayTick { stroke: var(--stroke-2); }
+
+/* Fast, frequent, and uniform — every day gets one, in quick
+   succession, which is what makes it read as "daily" rather than
+   a one-off event. */
+.daily {
   fill: var(--game);
+  opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: pulse-dot 1.8s ease-in-out infinite;
+  animation: pop-daily 6s linear infinite;
   animation-delay: var(--delay, 0s);
 }
 
-@keyframes pulse-dot {
-  0%, 100% { transform: scale(.7); opacity: .3; }
-  50% { transform: scale(1.15); opacity: 1; }
+/* Once, later, bigger — the same reset rhythm but at a slower cadence,
+   landing right as the week's run of daily ticks finishes. Shape (a
+   diamond, not a circle) carries the distinction, not just timing. */
+.weekly {
+  fill: var(--violet);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-weekly 6s linear infinite;
+}
+
+@keyframes pop-daily {
+  0%, 4% { opacity: 0; transform: scale(.4); }
+  14% { opacity: 1; transform: scale(1.15); }
+  20% { transform: scale(1); }
+  70% { opacity: 1; transform: scale(1); }
+  86%, 100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes pop-weekly {
+  0%, 74% { opacity: 0; transform: scale(.3); }
+  82% { opacity: 1; transform: scale(1.25); }
+  88% { transform: scale(1); }
+  92% { opacity: 1; transform: scale(1); }
+  97%, 100% { opacity: 0; transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dot { animation: none; transform: scale(1); opacity: .8; }
+  .daily, .weekly { animation: none; opacity: 1; transform: scale(1); }
 }

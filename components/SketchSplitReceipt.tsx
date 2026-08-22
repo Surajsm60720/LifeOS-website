@@ -1,29 +1,27 @@
 import styles from "./SketchSplitReceipt.module.css";
 
 /**
- * Line items draw in, a heavier total line settles at the bottom, then
- * the bill fans out into three people — "split the evening, not the
- * app" as the receipt itself dividing, rather than a screenshot of a
- * balance sheet.
+ * Real line-item amounts and a subtotal rule above the split, rather
+ * than stand-in squiggles — "split the evening" reads as an actual
+ * expense only once there's real-looking money on the page.
  */
 export function SketchSplitReceipt({ caption }: { caption: string }) {
   return (
     <figure className={styles.sketch} aria-hidden="true">
       <svg className={styles.glyph} viewBox="0 0 120 150" fill="none">
         <rect className={styles.paper} x="20" y="14" width="80" height="92" rx="6" strokeWidth="2.4" />
-        <path
-          className={`${styles.line} ${styles.line1}`}
-          pathLength="1"
-          strokeWidth="2"
-          d="M32 36C46 34 58 37 70 35C78 34 84 36 88 35"
-        />
-        <path
-          className={`${styles.line} ${styles.line2}`}
-          pathLength="1"
-          strokeWidth="2"
-          d="M32 52C44 50 56 53 68 51C76 50 82 52 88 51"
-        />
-        <path className={styles.total} pathLength="1" strokeWidth="3" d="M32 78C46 76 60 79 88 77" />
+        <text className={`${styles.amount} ${styles.line1}`} x="30" y="42">
+          $18
+        </text>
+        <text className={`${styles.amount} ${styles.line2}`} x="30" y="60">
+          $24
+        </text>
+        <g className={styles.totalGroup}>
+          <line className={styles.rule} x1="30" y1="70" x2="90" y2="70" strokeWidth="1.6" />
+          <text className={styles.total} x="30" y="93">
+            $62
+          </text>
+        </g>
         <path
           className={`${styles.connector} ${styles.c1}`}
           pathLength="1"

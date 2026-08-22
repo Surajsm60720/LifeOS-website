@@ -13,8 +13,8 @@
   overflow: visible;
 }
 
-/* The bell never animates — it's the thing that's permanently off,
-   and being the one static element in the drawing is what says so. */
+/* The bell itself never animates — it's the thing that's permanently
+   off, and staying still is what says so. */
 .bell {
   stroke: var(--ink-light);
   fill: none;
@@ -22,20 +22,25 @@
   stroke-linejoin: round;
 }
 
-.track { stroke: var(--stroke-2); fill: none; }
-
-.fill {
-  fill: var(--ent);
-  animation: fill-progress 6s ease-in-out infinite;
+/* The one beat in this sketch: the mute stroke draws itself across the
+   bell, diagonally, on repeat — the silencing as an ongoing act rather
+   than a fact stated once. */
+.mute {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-mute 6s linear infinite;
 }
 
-@keyframes fill-progress {
-  0%, 10% { width: 4px; }
-  55% { width: 72px; }
-  78% { width: 72px; }
-  100% { width: 4px; }
+@keyframes draw-mute {
+  0%, 8% { stroke-dashoffset: 1; opacity: 1; }
+  32% { stroke-dashoffset: 0; opacity: 1; }
+  78% { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { stroke-dashoffset: 0; opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fill { animation: none; width: 72px; }
+  .mute { animation: none; stroke-dashoffset: 0; opacity: 1; }
 }

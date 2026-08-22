@@ -22,6 +22,20 @@ type RevealContextValue = {
    *  it stays open until the staggered page-close below has finished,
    *  so the cover doesn't slam shut and hide that animation behind it. */
   visualCoverOpen: boolean;
+  /**
+   * True once the footer has scrolled into view. ExperienceStage folds
+   * this into Scene/Gate's own visibility the same way it already does
+   * for `contentVisible` — the fixed 3D stage covers the full viewport,
+   * so once the footer is genuinely on screen underneath it, the pad
+   * needs to be gone, whether or not it was ever flipped open. Scroll
+   * progress alone can't drive this: it's clamped to 1 for the entire
+   * rest of the page's height once the runway's done, so it can't tell
+   * "just finished opening" from "scrolled three screens further" —
+   * exactly the two moments that need different pad visibility here.
+   */
+  footerVisible: boolean;
+  /** Wired up by Footer's own IntersectionObserver — not meant to be called from anywhere else. */
+  setFooterVisible: (visible: boolean) => void;
   dispatchScroll: (progress: number) => void;
   /** Deliberate "turn the page" interaction — requires the cover to
    *  already be open (via scroll), animates pages open with a stagger. */
@@ -38,6 +52,7 @@ const RevealContext = createContext<RevealContextValue | null>(null);
 export function RevealProvider({ children }: { children: React.ReactNode }) {
   const [padState, dispatch] = useReducer(padStateReducer, initialPadState);
   const [contentVisible, setContentVisible] = useState(false);
+  const [footerVisible, setFooterVisible] = useState(false);
   const reduced = useReducedMotion();
 
   // Scrolling back closes the pad (padState resets, flipped -> false) —
@@ -130,6 +145,8 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
         revealed: padState.flipped,
         contentVisible,
         visualCoverOpen,
+        footerVisible,
+        setFooterVisible,
         dispatchScroll,
         flip,
         skipToRevealed,

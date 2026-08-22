@@ -8,39 +8,35 @@
 
 .glyph {
   width: 100%;
-  max-width: 152px;
-  aspect-ratio: 1;
+  max-width: 200px;
+  aspect-ratio: 220 / 90;
   overflow: visible;
 }
 
-/* Loop and tick are the fixed cycle boundary — permanently drawn, never
-   redrawn — so only the marker riding it needs to move. */
-.mark { stroke: var(--ink-light); }
-.loop { stroke: var(--ink-light); fill: none; }
+/* The fixed grid this drifts against — evenly spaced, permanent,
+   never moves. The bracket's own width (62 units) doesn't divide
+   evenly into the tick spacing (54 units) on purpose, so sliding it
+   at a constant speed keeps missing the ticks rather than ever
+   settling into lockstep with them. */
+.rail { stroke: var(--stroke-2); }
+.monthTick { stroke: var(--stroke-2); }
 
-/*
- * A dot "travelling around" a circle is really just this circle
- * spinning about its own centre with the dot fixed at one point on it —
- * a plain rotate, not offset-path. (offset-path on a native SVG <circle>
- * doesn't anchor at the element's own cx/cy the way it does for an HTML
- * element; the marker rendered nowhere near the loop when tried that
- * way, confirmed by reading its computed bounding box.)
- */
-.orbit {
+.bracket {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
   transform-box: view-box;
-  transform-origin: 70px 70px;
-  animation: orbit 5s linear infinite;
+  animation: drift 6s linear infinite;
 }
 
-.marker {
-  fill: var(--mint);
-}
-
-@keyframes orbit {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes drift {
+  0% { transform: translateX(0); opacity: 0; }
+  8% { opacity: 1; }
+  88% { transform: translateX(130px); opacity: 1; }
+  96%, 100% { transform: translateX(130px); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .orbit { animation: none; transform: rotate(80deg); }
+  /* Parked deliberately between two ticks, not on one. */
+  .bracket { animation: none; transform: translateX(45px); opacity: 1; }
 }
