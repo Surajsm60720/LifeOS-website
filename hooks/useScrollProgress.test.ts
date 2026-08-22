@@ -34,8 +34,8 @@ describe("useScrollProgress", () => {
 
   it("damps toward the target progress as scrollY changes and frames advance", () => {
     const { result } = renderHook(() => useScrollProgress());
-    // desktop runway height = 1000 * 1.9 = 1900; scrolling to 1900 => target 1
-    Object.defineProperty(window, "scrollY", { value: 1900, writable: true });
+    // desktop runway height = 1000 * 1.3 = 1300; scrolling to 1300 => target 1
+    Object.defineProperty(window, "scrollY", { value: 1300, writable: true });
     act(() => {
       window.dispatchEvent(new Event("scroll"));
       for (let i = 0; i < 200; i++) flushFrame();
@@ -51,7 +51,7 @@ describe("useScrollProgress", () => {
 
   it("rawProgress reflects a scroll jump immediately, with no damping lag", () => {
     const { result } = renderHook(() => useScrollProgress());
-    Object.defineProperty(window, "scrollY", { value: 1900, writable: true });
+    Object.defineProperty(window, "scrollY", { value: 1300, writable: true });
     act(() => {
       window.dispatchEvent(new Event("scroll"));
     });

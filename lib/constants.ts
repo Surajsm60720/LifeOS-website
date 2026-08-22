@@ -3,8 +3,13 @@
 // elsewhere (v1 rough edge P2 #4: these were previously duplicated
 // between inline <style> and inline <script> and could silently desync).
 
-export const RUNWAY_MULTIPLIER_DESKTOP = 1.9;
-export const RUNWAY_MULTIPLIER_NARROW = 1.5;
+// Shorter than the original 1.9/1.5 — that reserved enough scroll
+// distance that clicking "Turn the page" partway through the runway
+// (as soon as the gate appears, at COVER_OPEN_THRESHOLD) could still
+// jump the viewport a couple hundred px further to reach the notebook,
+// reading as an unexpected extra scroll on top of a button click.
+export const RUNWAY_MULTIPLIER_DESKTOP = 1.3;
+export const RUNWAY_MULTIPLIER_NARROW = 1.1;
 export const NARROW_BREAKPOINT_PX = 880;
 
 export const SCROLL_DAMPING = 0.075;

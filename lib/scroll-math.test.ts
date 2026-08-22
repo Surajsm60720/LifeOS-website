@@ -35,10 +35,10 @@ describe("isNarrowViewport", () => {
 
 describe("computeRunwayHeightPx", () => {
   it("uses the desktop multiplier when not narrow", () => {
-    expect(computeRunwayHeightPx(1000, false)).toBeCloseTo(1900, 5);
+    expect(computeRunwayHeightPx(1000, false)).toBeCloseTo(1300, 5);
   });
   it("uses the narrow multiplier when narrow", () => {
-    expect(computeRunwayHeightPx(1000, true)).toBeCloseTo(1500, 5);
+    expect(computeRunwayHeightPx(1000, true)).toBeCloseTo(1100, 5);
   });
 });
 

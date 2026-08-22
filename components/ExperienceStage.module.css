@@ -1,9 +1,12 @@
+/* Mirrors RUNWAY_MULTIPLIER_DESKTOP/NARROW in lib/constants.ts * 100 —
+   CSS can't read a JS constant, so this literal has to be kept in sync
+   by hand whenever that one changes. */
 .runway {
-  height: 190svh;
+  height: 130svh;
   position: relative;
   z-index: 2;
   pointer-events: none;
 }
 @media (max-width: 880px) {
-  .runway { height: 150svh; }
+  .runway { height: 110svh; }
 }

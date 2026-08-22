@@ -118,10 +118,21 @@ export function MainReveal() {
       // At either end, do nothing at all — that lets the gesture fall
       // through to native scroll, carrying the visitor on into the
       // footer or back up toward the pad, without this ever trapping
-      // the page.
+      // the page. This boundary check must be the ONLY thing deciding
+      // whether native scroll gets a look at the event. It used to also
+      // skip preventDefault for small deltas, on the theory that tiny
+      // ticks aren't a deliberate flick — but real trackpad scrolling
+      // sends a continuous stream of many small-delta events (gesture
+      // noise, deceleration tail), and every one of those was leaking
+      // straight through to native document scroll while still deep in
+      // the middle of pagination. Confirmed live: enough of them in a
+      // row drifted window.scrollY back down across the pad's own
+      // close threshold, reopening the gate simultaneously with page 5
+      // and the footer, all three visible at once. Small deltas now
+      // still get swallowed here — they just don't trigger a page turn.
       if (wantsNext ? index === lastIndex : index === 0) return;
-      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
       e.preventDefault();
+      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
       el?.focus({ preventScroll: true });
       goTo(index + (wantsNext ? 1 : -1));
     }
@@ -131,7 +142,11 @@ export function MainReveal() {
       const dy = touchStartYRef.current - (e.touches[0]?.clientY ?? touchStartYRef.current);
       const wantsNext = dy > 0;
       const atBoundary = wantsNext ? index === lastIndex : index === 0;
-      if (!atBoundary && Math.abs(dy) > 6) e.preventDefault();
+      // Same reasoning as onWheel: only the boundary decides whether
+      // native scroll gets the event. Small per-frame touch deltas
+      // (finger tremor during an otherwise deliberate swipe) used to
+      // fall through here too.
+      if (!atBoundary) e.preventDefault();
     }
 
     el.addEventListener("wheel", onWheel, { passive: false });
