@@ -2,7 +2,28 @@ import styles from "./FeatureSection.module.css";
 import type { FeatureSection as FeatureSectionData } from "@/lib/content";
 import { MediaSlot } from "./MediaSlot";
 import { SketchFaceID } from "./SketchFaceID";
+import { SketchDynamicIsland } from "./SketchDynamicIsland";
+import { SketchHeatGrid } from "./SketchHeatGrid";
+import { SketchMapPin } from "./SketchMapPin";
+import { SketchSwipeRow } from "./SketchSwipeRow";
 import { Reveal } from "./Reveal";
+
+function cardMedia(card: FeatureSectionData["cards"][number], seed: number) {
+  switch (card.sketch) {
+    case "faceid":
+      return <SketchFaceID caption={card.sketchCaption ?? ""} />;
+    case "dynamicIsland":
+      return <SketchDynamicIsland caption={card.sketchCaption ?? ""} />;
+    case "heatGrid":
+      return <SketchHeatGrid caption={card.sketchCaption ?? ""} />;
+    case "mapPin":
+      return <SketchMapPin caption={card.sketchCaption ?? ""} />;
+    case "swipeRow":
+      return <SketchSwipeRow caption={card.sketchCaption ?? ""} />;
+    default:
+      return <MediaSlot seed={seed} />;
+  }
+}
 
 export function FeatureSection({ section }: { section: FeatureSectionData }) {
   return (
@@ -23,11 +44,7 @@ export function FeatureSection({ section }: { section: FeatureSectionData }) {
               <h3>{card.title}</h3>
               <p>{card.body}</p>
             </div>
-            {card.sketch === "faceid" ? (
-              <SketchFaceID caption={card.sketchCaption ?? ""} />
-            ) : (
-              <MediaSlot seed={i} />
-            )}
+            {cardMedia(card, i)}
           </Reveal>
         ))}
       </div>

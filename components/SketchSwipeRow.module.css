@@ -1,0 +1,88 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 208px;
+  aspect-ratio: 240 / 90;
+  overflow: visible;
+}
+
+.rowOutline {
+  /* Opaque, matching the notebook page behind it — this is what does the
+     occluding as the row slides, the same way a real list row's own
+     background hides the action underneath it until it moves. */
+  fill: var(--elevated);
+  stroke: var(--ink-light);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+}
+
+.dot { fill: var(--ink-light); }
+
+.text {
+  stroke: var(--ink-light);
+  stroke-linecap: round;
+  fill: none;
+  opacity: .55;
+}
+
+.check {
+  stroke: var(--mint);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: reveal-check 7s linear infinite;
+}
+
+.trash {
+  stroke: var(--coral);
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: reveal-trash 7s linear infinite;
+}
+
+.row {
+  transform-box: view-box;
+  animation: swipe-row 7s linear infinite;
+}
+
+@keyframes swipe-row {
+  0%, 8% { transform: translateX(0); }
+  22% { transform: translateX(46px); }
+  40% { transform: translateX(46px); }
+  50% { transform: translateX(0); }
+  58%, 62% { transform: translateX(0); }
+  76% { transform: translateX(-46px); }
+  90% { transform: translateX(-46px); }
+  98%, 100% { transform: translateX(0); }
+}
+
+@keyframes reveal-check {
+  0%, 16% { stroke-dashoffset: 1; opacity: 0; }
+  26% { stroke-dashoffset: 0; opacity: 1; }
+  40% { stroke-dashoffset: 0; opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes reveal-trash {
+  0%, 70% { stroke-dashoffset: 1; opacity: 0; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  90% { stroke-dashoffset: 0; opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row { animation: none; transform: translateX(46px); }
+  .check { animation: none; stroke-dashoffset: 0; opacity: 1; }
+  .trash { display: none; }
+}

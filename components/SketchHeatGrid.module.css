@@ -1,0 +1,43 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.grid {
+  width: 100%;
+  max-width: 190px;
+  aspect-ratio: 7 / 5;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+/*
+ * --level (0-3) is a per-cell custom property, read straight inside the
+ * keyframe via calc() — no per-level class needed, and no JS driving the
+ * animation, just 35 elements each running the same keyframe against a
+ * different value.
+ */
+.cell {
+  --level: 0;
+  border-radius: 3px;
+  background: var(--coral);
+  border: 1px solid var(--stroke-2);
+  opacity: .12;
+  animation: heat-fill 6s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes heat-fill {
+  0%, 4% { opacity: .12; }
+  30% { opacity: calc(var(--level) * .24 + .12); }
+  72% { opacity: calc(var(--level) * .24 + .12); }
+  92%, 100% { opacity: .12; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell { animation: none; opacity: calc(var(--level) * .24 + .12); }
+}

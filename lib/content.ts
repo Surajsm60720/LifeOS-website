@@ -10,7 +10,7 @@ export type ChipSegment = { text: string; bold?: boolean };
  * strokes get one — a sketch that needs explaining is worse than the
  * honest placeholder.
  */
-export type SketchKind = "faceid";
+export type SketchKind = "faceid" | "dynamicIsland" | "heatGrid" | "mapPin" | "swipeRow";
 export type FeatureCard = {
   tag: string;
   dotVar: string;
@@ -85,12 +85,16 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--coral",
         title: "Pick your default",
         body: "Four views, a configurable landing view, and swipe-to-complete or delete straight from Day, Week and Month rows.",
+        sketch: "swipeRow",
+        sketchCaption: "swipe it away —",
       },
       {
         tag: "Heat",
         dotVar: "--coral",
         title: "A year at a glance",
         body: "Month heat grids and year-long mini-month contribution maps — count-based, so a dense week reads as dense.",
+        sketch: "heatGrid",
+        sketchCaption: "a year, at a glance —",
       },
       {
         tag: "Ongoing",
@@ -129,6 +133,8 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--violet",
         title: "Today, in the Dynamic Island",
         body: "A count badge in the Island and up to three events on the Lock Screen, re-synced whenever you open the app.",
+        sketch: "dynamicIsland",
+        sketchCaption: "today, right there —",
       },
     ],
   },
@@ -141,6 +147,8 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--gi",
         title: "Search, drop a pin, or use where you are",
         body: "Reverse-geocoding fills the name after a pin drop, and rows show a live MapKit thumbnail. Only a name and coordinates are ever stored.",
+        sketch: "mapPin",
+        sketchCaption: "drop a pin —",
       },
       {
         tag: "Hangout ledger",

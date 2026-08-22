@@ -1,0 +1,35 @@
+/*
+ * Shared shell for every hand-drawn sketch (SketchFaceID,
+ * SketchDynamicIsland, SketchHeatGrid, SketchMapPin, SketchSwipeRow) —
+ * same slot footprint as MediaSlot so alternating rows line up either
+ * way, and the same tilt/caption treatment so every drawing reads as
+ * the same hand holding the same pen, not five one-off components.
+ */
+.shell {
+  position: relative;
+  width: clamp(140px, 24vw, 220px);
+  flex: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  transform: rotate(-2deg);
+}
+
+@media (max-width: 720px) {
+  .shell { width: min(76%, 220px); margin-top: .5rem; align-items: flex-start; }
+}
+
+.caption {
+  font-family: var(--hand);
+  font-size: 1.02rem;
+  line-height: 1.1;
+  color: var(--ink-light);
+  transform: rotate(1.4deg);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .caption { text-align: left; }
+}

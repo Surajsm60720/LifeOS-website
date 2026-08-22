@@ -1,0 +1,99 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 152px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.stroke {
+  stroke: var(--ink-light);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.roads .stroke { animation: draw-roads 6s linear infinite; }
+.roads .stroke:nth-child(2) { animation-delay: .08s; }
+
+.pin {
+  transform-box: view-box;
+  animation: drop-pin 6s linear infinite;
+}
+.pinShape {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Landing ping — a mint ring the pin's tip pulses out on arrival. */
+.ripple {
+  fill: none;
+  stroke: var(--gi);
+  stroke-width: 2.4;
+  transform-box: view-box;
+  transform-origin: 70px 92px;
+  animation: ripple 6s linear infinite;
+}
+
+.label {
+  stroke: var(--ink-light);
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-label 6s linear infinite;
+}
+
+@keyframes draw-roads {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  10% { stroke-dashoffset: 0; opacity: 1; }
+  86% { stroke-dashoffset: 0; opacity: 1; }
+  96%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes drop-pin {
+  0% { transform: translateY(-70px); opacity: 0; }
+  4% { opacity: 1; }
+  26% { transform: translateY(0); }
+  32% { transform: translateY(-9px); }
+  38% { transform: translateY(0); }
+  42% { transform: translateY(-3px); }
+  46%, 86% { transform: translateY(0); opacity: 1; }
+  96%, 100% { transform: translateY(0); opacity: 0; }
+}
+
+@keyframes ripple {
+  0%, 24% { transform: scale(0); opacity: 0; }
+  28% { transform: scale(.4); opacity: 1; }
+  42% { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes draw-label {
+  0%, 40% { stroke-dashoffset: 1; opacity: 0; }
+  52% { stroke-dashoffset: 0; opacity: 1; }
+  84% { stroke-dashoffset: 0; opacity: 1; }
+  94%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roads .stroke,
+  .label {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  .pin { animation: none; transform: translateY(0); opacity: 1; }
+  .ripple { display: none; }
+}
