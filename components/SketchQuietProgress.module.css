@@ -1,0 +1,41 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 152px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+/* The bell never animates — it's the thing that's permanently off,
+   and being the one static element in the drawing is what says so. */
+.bell {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track { stroke: var(--stroke-2); fill: none; }
+
+.fill {
+  fill: var(--ent);
+  animation: fill-progress 6s ease-in-out infinite;
+}
+
+@keyframes fill-progress {
+  0%, 10% { width: 4px; }
+  55% { width: 72px; }
+  78% { width: 72px; }
+  100% { width: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill { animation: none; width: 72px; }
+}

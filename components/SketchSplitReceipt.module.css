@@ -1,0 +1,101 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 120 / 150;
+  overflow: visible;
+}
+
+.paper {
+  stroke: var(--ink-light);
+  fill: var(--elevated);
+}
+
+.line {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.line1 { animation: draw-line 6s linear infinite; animation-delay: .08s; }
+.line2 { animation: draw-line 6s linear infinite; animation-delay: .18s; }
+
+.total {
+  stroke: var(--gold);
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-total 6s linear infinite;
+}
+
+.connector {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-connector 6s linear infinite;
+}
+.c1 { animation-delay: 0s; }
+.c2 { animation-delay: .06s; }
+.c3 { animation-delay: .12s; }
+
+.person {
+  fill: var(--gi);
+  fill-opacity: .3;
+  stroke: var(--ink-light);
+  stroke-width: 1.8;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-person 6s linear infinite;
+}
+.p1 { animation-delay: 0s; }
+.p2 { animation-delay: .08s; }
+.p3 { animation-delay: .16s; }
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 1; opacity: .6; }
+  20% { stroke-dashoffset: 0; opacity: .6; }
+  80% { stroke-dashoffset: 0; opacity: .6; }
+  92%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes draw-total {
+  0%, 26% { stroke-dashoffset: 1; opacity: 0; }
+  38% { stroke-dashoffset: 0; opacity: 1; }
+  80% { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+
+@keyframes draw-connector {
+  0%, 44% { stroke-dashoffset: 1; opacity: 0; }
+  56% { stroke-dashoffset: 0; opacity: .5; }
+  80% { stroke-dashoffset: 0; opacity: .5; }
+  92%, 100% { opacity: 0; }
+}
+
+@keyframes pop-person {
+  0%, 50% { opacity: 0; transform: scale(.5); }
+  62% { opacity: 1; transform: scale(1.1); }
+  68% { transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  92%, 100% { opacity: 0; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line, .total, .connector { animation: none; stroke-dashoffset: 0; }
+  .line { opacity: .6; }
+  .total { opacity: 1; }
+  .connector { opacity: .5; }
+  .person { animation: none; opacity: 1; transform: scale(1); }
+}

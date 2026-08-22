@@ -1,9 +1,3 @@
-/*
- * Occupies the same slot footprint as MediaSlot so the alternating
- * left/right row layout in FeatureSection lines up either way — but no
- * frame and no tape, because this is a doodle on the page itself rather
- * than a photo stuck onto it.
- */
 .sketch {
   composes: shell from "./Sketch.module.css";
   --loop: 6s;

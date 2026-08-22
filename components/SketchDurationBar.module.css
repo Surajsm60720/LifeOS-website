@@ -1,0 +1,46 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 176px;
+  aspect-ratio: 2 / 1;
+  overflow: visible;
+}
+
+.rail { stroke: var(--stroke-2); }
+.tick { stroke: var(--ink-light); }
+
+.clock {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bar {
+  fill: var(--irl);
+  fill-opacity: .3;
+  stroke: var(--ink-light);
+  stroke-width: 2.4;
+  animation: grow-bar 6s ease-in-out infinite;
+}
+
+/* Continuous — the bar is visible the whole loop, so unlike the
+   dash-draw sketches there's nothing to hide at the wrap point: 0%
+   and 100% both land on the same width, no pop either way. */
+@keyframes grow-bar {
+  0%, 8% { width: 26px; }
+  40% { width: 150px; }
+  62% { width: 150px; }
+  88%, 100% { width: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { animation: none; width: 150px; }
+}

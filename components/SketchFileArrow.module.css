@@ -1,0 +1,54 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 120 / 140;
+  overflow: visible;
+}
+
+.file, .foldLine, .tray {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Both arrows are always fully drawn — this is a plain opacity
+   crossfade of two static icons, not a dash reveal, so there's no
+   wrap-point trick needed at all: both keyframes already return to
+   opacity 0 by 100%, matching their own 0% start. */
+.down, .up {
+  stroke: var(--gold);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+.down { animation: show-down 6s linear infinite; }
+.up { animation: show-up 6s linear infinite; }
+
+@keyframes show-down {
+  0%, 6% { opacity: 0; }
+  16% { opacity: 1; }
+  42% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes show-up {
+  0%, 50% { opacity: 0; }
+  58% { opacity: 1; }
+  84% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .down { animation: none; opacity: 1; }
+  .up { display: none; }
+}

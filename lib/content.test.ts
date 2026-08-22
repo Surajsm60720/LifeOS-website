@@ -34,15 +34,20 @@ describe("feature sections", () => {
     expect(featureSections[0].id).toBe("features");
   });
 
-  it("every card with a sketch also has the handwritten caption that goes under it", () => {
-    // The two are typed independently but rendered together, so a sketch
-    // without its caption ships an empty line of Caveat under the drawing.
+  it("every card has the handwritten caption that goes under its sketch", () => {
+    // The two are typed independently but rendered together, so a card
+    // missing its caption ships an empty line of Caveat under the drawing.
     for (const section of featureSections) {
       for (const card of section.cards) {
-        if (!card.sketch) continue;
-        expect(card.sketchCaption?.trim().length ?? 0).toBeGreaterThan(0);
+        expect(card.sketch.trim().length).toBeGreaterThan(0);
+        expect(card.sketchCaption.trim().length).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("no two cards share the same sketch — every entry gets its own drawing", () => {
+    const kinds = featureSections.flatMap((s) => s.cards).map((c) => c.sketch);
+    expect(new Set(kinds).size).toBe(kinds.length);
   });
 
   it("the App Lock entry draws Face ID rather than reserving a photo slot", () => {

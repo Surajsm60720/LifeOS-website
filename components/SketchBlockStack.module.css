@@ -1,0 +1,52 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 152px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.block {
+  fill: var(--violet);
+  fill-opacity: .18;
+  stroke: var(--ink-light);
+  stroke-width: 2.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-block 6s linear infinite;
+}
+
+.stem {
+  stroke: var(--ink-light);
+  animation: fade-stem 6s linear infinite;
+}
+
+.block1, .stem1 { animation-delay: 0s; }
+.block2 { animation-delay: .12s; }
+.stem2 { animation-delay: .18s; }
+.block3 { animation-delay: .3s; }
+
+@keyframes pop-block {
+  0%, 4% { opacity: 0; transform: scale(.7); }
+  16% { opacity: 1; transform: scale(1); }
+  74% { opacity: 1; transform: scale(1); }
+  90%, 100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes fade-stem {
+  0%, 4% { opacity: 0; }
+  16% { opacity: 1; }
+  74% { opacity: 1; }
+  90%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block, .stem { animation: none; opacity: 1; transform: scale(1); }
+}

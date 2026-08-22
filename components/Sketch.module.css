@@ -1,9 +1,10 @@
 /*
- * Shared shell for every hand-drawn sketch (SketchFaceID,
- * SketchDynamicIsland, SketchHeatGrid, SketchMapPin, SketchSwipeRow) —
- * same slot footprint as MediaSlot so alternating rows line up either
- * way, and the same tilt/caption treatment so every drawing reads as
- * the same hand holding the same pen, not five one-off components.
+ * Shared shell for every hand-drawn sketch (one Sketch* component per
+ * SketchKind in lib/content.ts, dispatched in FeatureSection) — the
+ * fixed slot footprint every one of them sits in, so alternating rows
+ * line up either way, and the same tilt/caption treatment so every
+ * drawing reads as the same hand holding the same pen, not fifteen
+ * one-off components.
  */
 .shell {
   position: relative;

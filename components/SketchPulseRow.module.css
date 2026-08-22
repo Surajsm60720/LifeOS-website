@@ -1,0 +1,34 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 176px;
+  aspect-ratio: 20 / 9;
+  overflow: visible;
+}
+
+/* Faster and shorter than the narrative sketches on purpose — a
+   metronome reads as cadence precisely because it's quick and doesn't
+   pause for a story, unlike a one-shot draw-then-hold animation. */
+.dot {
+  fill: var(--game);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse-dot 1.8s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(.7); opacity: .3; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation: none; transform: scale(1); opacity: .8; }
+}

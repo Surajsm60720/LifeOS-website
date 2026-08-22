@@ -4,21 +4,31 @@
 // (see the design spec, §0).
 
 export type ChipSegment = { text: string; bold?: boolean };
-/**
- * Entries that have a hand-drawn accent instead of the taped "photo
- * pending" slot. Only the ones whose behaviour is drawable in a few pen
- * strokes get one — a sketch that needs explaining is worse than the
- * honest placeholder.
- */
-export type SketchKind = "faceid" | "dynamicIsland" | "heatGrid" | "mapPin" | "swipeRow";
+/** Every card gets a hand-drawn accent in place of a photo — one Sketch* component per kind, dispatched in FeatureSection. */
+export type SketchKind =
+  | "faceid"
+  | "dynamicIsland"
+  | "heatGrid"
+  | "mapPin"
+  | "swipeRow"
+  | "durationBar"
+  | "pulseRow"
+  | "quietProgress"
+  | "windowFill"
+  | "loopMarker"
+  | "blockStack"
+  | "quotaRing"
+  | "splitReceipt"
+  | "fileArrow"
+  | "markdownLines";
 export type FeatureCard = {
   tag: string;
   dotVar: string;
   title: string;
   body: string;
-  sketch?: SketchKind;
-  /** Handwritten line under the sketch. Required whenever `sketch` is set. */
-  sketchCaption?: string;
+  sketch: SketchKind;
+  /** Handwritten line under the sketch. */
+  sketchCaption: string;
 };
 export type FeatureSection = {
   id?: string;
@@ -61,18 +71,24 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--irl",
         title: "Plans that behave like plans",
         body: "All-day or timed, minutes through 365 days, with an end date. Multi-stop locations, and an expense ledger when the evening costs something.",
+        sketch: "durationBar",
+        sketchCaption: "minutes to months —",
       },
       {
         tag: "Games",
         dotVar: "--game",
         title: "Cadence you can actually see",
         body: "Dailies, weeklies, banners, patches, livestreams, in-game events — typed per title for Genshin, Star Rail and Wuthering Waves. Other games get a session log instead.",
+        sketch: "pulseRow",
+        sketchCaption: "same time, every time —",
       },
       {
         tag: "Entertainment",
         dotVar: "--ent",
         title: "Progress without nagging",
         body: "Episodes, chapters and pages with optional per-session targets. Deliberately notification-free — it shows up on the calendar, it never chases you.",
+        sketch: "quietProgress",
+        sketchCaption: "no nagging —",
       },
     ],
   },
@@ -101,12 +117,16 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--mint",
         title: "Windows, not just start dates",
         body: "A dedicated tab for anything spanning 24 hours or more: Active Now, Starting Soon, and collapsible Recently Ended, with progress and days remaining.",
+        sketch: "windowFill",
+        sketchCaption: "still going —",
       },
       {
         tag: "Cycles",
         dotVar: "--mint",
         title: "This occurrence to the next",
         body: "Weekly and monthly cadence shows as a live cycle — 16 Aug → 16 Sep, not a calendar-month approximation. Dailies stay out, so the tab never floods.",
+        sketch: "loopMarker",
+        sketchCaption: "around again —",
       },
     ],
   },
@@ -121,12 +141,16 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--violet",
         title: "Built like Shortcuts",
         body: "Fixed time, relative to start, relative to end, a specific date, or only if it's still not done — with editable message text.",
+        sketch: "blockStack",
+        sketchCaption: "one step at a time —",
       },
       {
         tag: "Budget",
         dotVar: "--violet",
         title: "Scheduled, remaining, firing today",
         body: "A live count of where you stand against the cap, plus presets for end-of-day check-ins, morning dailies and last-day reminders.",
+        sketch: "quotaRing",
+        sketchCaption: "against the cap —",
       },
       {
         tag: "Live Activity",
@@ -155,6 +179,8 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--gi",
         title: "Split the evening, not the app",
         body: "Line items with a running total, an equal split across freestyle names, who-owes-you balances, and a settlement summary you can share or copy.",
+        sketch: "splitReceipt",
+        sketchCaption: "split three ways —",
       },
     ],
   },
@@ -167,12 +193,16 @@ export const featureSections: FeatureSection[] = [
         dotVar: "--gold",
         title: "JSON, replace or merge",
         body: "Full-library export and import as a file you own. Older backups stay importable; only newer-version files are refused, with a reason.",
+        sketch: "fileArrow",
+        sketchCaption: "yours either way —",
       },
       {
         tag: "Recap",
         dotVar: "--gold",
         title: "Markdown built for summarising",
         body: "A date-ranged export with pre-computed stats, written to be pasted into an LLM by hand — the app never calls one itself.",
+        sketch: "markdownLines",
+        sketchCaption: "written for you —",
       },
       {
         tag: "App Lock",
