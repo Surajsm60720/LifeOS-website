@@ -1,15 +1,53 @@
+/*
+ * A single 100dvh slot in normal document flow — not fixed, not
+ * sticky. Wheel/touch/keyboard are intercepted here to page between
+ * notebook pages, but at either end (first page going back, last page
+ * going forward) the handlers deliberately do nothing, letting the
+ * gesture fall through to ordinary scroll and carry the visitor out of
+ * this slot entirely. That's what keeps this from ever trapping the
+ * page — no explicit "exit pagination" logic needed.
+ */
 .main {
   position: relative;
   z-index: 2;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   pointer-events: none;
+  outline: none;
   transition: opacity .6s ease;
-  padding-block: clamp(3rem, 8vw, 6rem);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2.5rem, 6vw, 4rem);
 }
 .revealed {
   opacity: 1;
   pointer-events: auto;
+}
+
+.dots {
+  position: absolute;
+  right: clamp(1rem, 4vw, 2.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  z-index: 6;
+}
+.dot,
+.dotActive {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stroke-2);
+  transition: background .25s ease, transform .25s ease;
+}
+.dotActive {
+  background: var(--coral);
+  transform: scale(1.4);
+}
+
+@media (max-width: 720px) {
+  .dots { display: none; }
 }

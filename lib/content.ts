@@ -221,13 +221,16 @@ export const footerBody =
   "A personal project, not an App Store release. Clone the repo, open it in Xcode with your own signing team, and run it.";
 export const footerSmallLines = ["LifeOS v1.0.2", "Swift · SwiftUI · SwiftData", "Local-first by design"];
 
-// Groups the sections above into the notebook's 3 physical pages, so the
-// content reads as pages of the pad rather than one undifferentiated
-// scroll of cards.
+// One notebook page per section — previously pages 2 and 3 each carried
+// two whole sections (7 and 5 cards) against page 1's 3, so the "book"
+// read as badly unbalanced. One-per-page gives 3/4/3/2/3 cards a page,
+// close enough to even that no page reads as the short one or the slog.
 export type ContentPage = { label: string; sections: FeatureSection[] };
 
 export const contentPages: ContentPage[] = [
   { label: "01", sections: [featureSections[0]] },
-  { label: "02", sections: [featureSections[1], featureSections[2]] },
-  { label: "03", sections: [featureSections[3], featureSections[4]] },
+  { label: "02", sections: [featureSections[1]] },
+  { label: "03", sections: [featureSections[2]] },
+  { label: "04", sections: [featureSections[3]] },
+  { label: "05", sections: [featureSections[4]] },
 ];

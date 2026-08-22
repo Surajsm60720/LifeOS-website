@@ -57,8 +57,11 @@ describe("feature sections", () => {
 });
 
 describe("content pages", () => {
-  it("has exactly 3 pages, matching the pad's 4 physical pages minus the removed spec/absent page", () => {
-    expect(contentPages).toHaveLength(3);
+  it("has one page per feature section — no page carries more than one topic", () => {
+    expect(contentPages).toHaveLength(featureSections.length);
+    for (const page of contentPages) {
+      expect(page.sections).toHaveLength(1);
+    }
   });
 
   it("every featureSections entry appears in exactly one page, in order, with none dropped or duplicated", () => {

@@ -2,16 +2,25 @@
  * One page of the notebook — the same shape as the gate card and the
  * 3D pad itself: rounded card, ring binding across the top edge. Content
  * lives *inside* that shape, not next to it or spread edge-to-edge.
+ *
+ * Each page is now one full-viewport slide in a paginated sequence
+ * (MainReveal), not a block in an endless scroll — so it's bounded to
+ * the viewport height rather than growing however tall its content
+ * wants. A page whose content is genuinely too dense to fit (a small
+ * screen, a zoomed-in browser) scrolls internally rather than being
+ * clipped, which keeps "one page = one screen" true even in that case.
  */
 .page {
   position: relative;
   width: min(760px, calc(100% - 2 * var(--gut)));
+  max-height: min(88dvh, 760px);
+  overflow-y: auto;
   margin-inline: auto;
   background: var(--elevated);
   border: 1px solid var(--stroke-2);
   border-radius: 28px;
   box-shadow: 0 40px 90px -40px rgba(0, 0, 0, .7), 0 1px 0 rgba(255, 255, 255, .03) inset;
-  padding: clamp(2.4rem, 6vw, 3.5rem) clamp(1.8rem, 5vw, 3.25rem) clamp(1.8rem, 5vw, 3.25rem);
+  padding: clamp(1.6rem, 4vw, 2.5rem) clamp(1.8rem, 5vw, 3.25rem) clamp(1.4rem, 3vw, 2rem);
 }
 
 .page::before {
