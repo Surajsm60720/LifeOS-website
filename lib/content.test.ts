@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { heroChips, featureSections, contentPages } from "./content";
+import { heroChips, featureSections, contentPages, closingSection, repoUrl } from "./content";
 
 describe("hero chips", () => {
   it("has exactly 5 chips, matching the v1.0.2 hero", () => {
@@ -57,16 +57,17 @@ describe("feature sections", () => {
 });
 
 describe("content pages", () => {
-  it("has one page per feature section — no page carries more than one topic", () => {
-    expect(contentPages).toHaveLength(featureSections.length);
+  it("has one page per feature section, plus one closing page — no page carries more than one topic", () => {
+    expect(contentPages).toHaveLength(featureSections.length + 1);
     for (const page of contentPages) {
       expect(page.sections).toHaveLength(1);
     }
   });
 
-  it("every featureSections entry appears in exactly one page, in order, with none dropped or duplicated", () => {
+  it("every featureSections entry appears in exactly one page, in order, with none dropped or duplicated, followed by the closing page", () => {
     const referenced = contentPages.flatMap((page) => page.sections);
-    expect(referenced).toEqual(featureSections);
+    expect(referenced.slice(0, featureSections.length)).toEqual(featureSections);
+    expect(referenced[featureSections.length]).toBe(closingSection);
   });
 
   it("no page is empty", () => {
@@ -74,5 +75,22 @@ describe("content pages", () => {
       expect(page.sections.length).toBeGreaterThan(0);
       expect(page.label.trim().length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("closing section", () => {
+  it("has no empty title/body/tag on any card", () => {
+    for (const card of closingSection.cards) {
+      expect(card.tag.trim().length).toBeGreaterThan(0);
+      expect(card.title.trim().length).toBeGreaterThan(0);
+      expect(card.body.trim().length).toBeGreaterThan(0);
+      expect(card.sketchCaption.trim().length).toBeGreaterThan(0);
+    }
+  });
+
+  it("the Source card links to the real repo", () => {
+    const source = closingSection.cards.find((c) => c.tag === "Source");
+    expect(source?.link?.href).toBe(repoUrl);
+    expect(source?.link?.label.length).toBeGreaterThan(0);
   });
 });

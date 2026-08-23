@@ -1,0 +1,51 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 120 / 140;
+  overflow: visible;
+}
+
+.trunk {
+  stroke: var(--ink-light);
+  stroke-linecap: round;
+}
+
+.commits circle {
+  fill: var(--canvas);
+}
+.commits {
+  stroke: var(--ink-light);
+}
+.branchCommit {
+  stroke: var(--coral);
+}
+
+/* The branch draws itself out and back on repeat — the one motion in
+   an otherwise static graph, standing in for "clone" as an ongoing
+   invitation rather than a fact stated once. */
+.branch {
+  stroke: var(--coral);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-branch 6s linear infinite;
+}
+
+@keyframes draw-branch {
+  0%, 6% { stroke-dashoffset: 1; opacity: 1; }
+  46% { stroke-dashoffset: 0; opacity: 1; }
+  86% { stroke-dashoffset: 0; opacity: 1; }
+  96%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .branch { animation: none; stroke-dashoffset: 0; opacity: 1; }
+}

@@ -7,8 +7,8 @@ function Probe() {
     revealed,
     contentVisible,
     visualCoverOpen,
-    footerVisible,
-    setFooterVisible,
+    notebookReached,
+    setNotebookReached,
     padState,
     dispatchScroll,
     flip,
@@ -20,14 +20,14 @@ function Probe() {
       <span data-testid="content">{contentVisible ? "visible" : "hidden"}</span>
       <span data-testid="coverOpen">{padState.coverOpen ? "open" : "closed"}</span>
       <span data-testid="visualCoverOpen">{visualCoverOpen ? "open" : "closed"}</span>
-      <span data-testid="footerVisible">{footerVisible ? "visible" : "hidden"}</span>
+      <span data-testid="notebookReached">{notebookReached ? "visible" : "hidden"}</span>
       <span data-testid="pageTargets">{padState.pageTargets.join(",")}</span>
       <button onClick={() => dispatchScroll(0.9)}>scroll-in</button>
       <button onClick={() => dispatchScroll(0.5)}>scroll-back</button>
       <button onClick={flip}>flip</button>
       <button onClick={skipToRevealed}>skip</button>
-      <button onClick={() => setFooterVisible(true)}>footer-in</button>
-      <button onClick={() => setFooterVisible(false)}>footer-out</button>
+      <button onClick={() => setNotebookReached(true)}>notebook-in</button>
+      <button onClick={() => setNotebookReached(false)}>notebook-out</button>
     </>
   );
 }
@@ -167,19 +167,19 @@ describe("RevealProvider", () => {
     expect(screen.getByTestId("coverOpen")).toHaveTextContent("open");
   });
 
-  it("starts with footerVisible false, and reports it independently of whether the pad was ever flipped", () => {
+  it("starts with notebookReached false, and reports it independently of whether the pad was ever flipped", () => {
     render(
       <RevealProvider>
         <Probe />
       </RevealProvider>
     );
-    expect(screen.getByTestId("footerVisible")).toHaveTextContent("hidden");
-    // Never flipped, never even scrolled — Footer's own IntersectionObserver
+    expect(screen.getByTestId("notebookReached")).toHaveTextContent("hidden");
+    // Never flipped, never even scrolled — MainReveal's own IntersectionObserver
     // is the only thing that sets this, independent of padState entirely.
-    fireEvent.click(screen.getByText("footer-in"));
-    expect(screen.getByTestId("footerVisible")).toHaveTextContent("visible");
-    fireEvent.click(screen.getByText("footer-out"));
-    expect(screen.getByTestId("footerVisible")).toHaveTextContent("hidden");
+    fireEvent.click(screen.getByText("notebook-in"));
+    expect(screen.getByTestId("notebookReached")).toHaveTextContent("visible");
+    fireEvent.click(screen.getByText("notebook-out"));
+    expect(screen.getByTestId("notebookReached")).toHaveTextContent("hidden");
   });
 
   it("throws if useReveal is used outside the provider", () => {

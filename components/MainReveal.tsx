@@ -19,7 +19,7 @@ const SWIPE_THRESHOLD = 48;
 type PendingFocus = { behavior: ScrollBehavior } | null;
 
 export function MainReveal() {
-  const { contentVisible } = useReveal();
+  const { contentVisible, setNotebookReached } = useReveal();
   const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [turn, setTurn] = useState<{ direction: 1 | -1 } | null>(null);
@@ -103,6 +103,15 @@ export function MainReveal() {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  // Notebook is now the last section in the document — no separate
+  // footer after it to independently report "we're past the pad". This
+  // forwards the same local `inView` signal into RevealProvider so
+  // Scene/Gate can hide once scroll reaches here, whether or not the
+  // pad was ever explicitly flipped open (see notebookReached there).
+  useEffect(() => {
+    setNotebookReached(inView);
+  }, [inView, setNotebookReached]);
 
   // Decoupled from the hero/gate's "see the features" links via a DOM
   // event, since focus-features.ts is a plain utility with no reference

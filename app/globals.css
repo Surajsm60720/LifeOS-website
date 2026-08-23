@@ -29,9 +29,9 @@ body::before {
 .wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gut); }
 
 /*
- * Shared across Hero, FeatureSection, SpecList, DeliberatelyAbsent, and
- * Footer — v1 used one global .eyebrow class in all of these places, so
- * this stays global rather than duplicated per CSS Module.
+ * Shared across Hero, FeatureSection, and SpecList — v1 used one global
+ * .eyebrow class in all of these places, so this stays global rather
+ * than duplicated per CSS Module.
  */
 .eyebrow {
   font-family: var(--mono);

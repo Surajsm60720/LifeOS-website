@@ -15,6 +15,9 @@ import { SketchQuotaRing } from "./SketchQuotaRing";
 import { SketchSplitReceipt } from "./SketchSplitReceipt";
 import { SketchFileArrow } from "./SketchFileArrow";
 import { SketchMarkdownLines } from "./SketchMarkdownLines";
+import { SketchGitBranch } from "./SketchGitBranch";
+import { SketchTerminal } from "./SketchTerminal";
+import { SketchNoCloud } from "./SketchNoCloud";
 import { Reveal } from "./Reveal";
 
 function cardMedia(card: FeatureSectionData["cards"][number]) {
@@ -49,6 +52,12 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
       return <SketchFileArrow caption={card.sketchCaption} />;
     case "markdownLines":
       return <SketchMarkdownLines caption={card.sketchCaption} />;
+    case "gitBranch":
+      return <SketchGitBranch caption={card.sketchCaption} />;
+    case "terminal":
+      return <SketchTerminal caption={card.sketchCaption} />;
+    case "noCloud":
+      return <SketchNoCloud caption={card.sketchCaption} />;
   }
 }
 
@@ -70,6 +79,11 @@ export function FeatureSection({ section }: { section: FeatureSectionData }) {
               </span>
               <h3>{card.title}</h3>
               <p>{card.body}</p>
+              {card.link && (
+                <a className={styles.link} href={card.link.href} target="_blank" rel="noopener">
+                  {card.link.label}
+                </a>
+              )}
             </div>
             {cardMedia(card)}
           </Reveal>

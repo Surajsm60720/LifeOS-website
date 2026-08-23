@@ -1,0 +1,48 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 140px;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+/* The cloud and the phone never animate — the drawing states the fact
+   once and holds it, the same restraint SketchQuietProgress uses for
+   "deliberately notification-free". */
+.cloud, .device {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dot {
+  fill: var(--ink-light);
+}
+
+/* The one beat: the strike draws itself across the cloud on repeat. */
+.strike {
+  stroke: var(--violet);
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw-strike 6s linear infinite;
+}
+
+@keyframes draw-strike {
+  0%, 8% { stroke-dashoffset: 1; opacity: 1; }
+  32% { stroke-dashoffset: 0; opacity: 1; }
+  78% { stroke-dashoffset: 0; opacity: 1; }
+  92%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strike { animation: none; stroke-dashoffset: 0; opacity: 1; }
+}

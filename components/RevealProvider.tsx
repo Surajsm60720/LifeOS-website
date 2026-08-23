@@ -23,19 +23,20 @@ type RevealContextValue = {
    *  so the cover doesn't slam shut and hide that animation behind it. */
   visualCoverOpen: boolean;
   /**
-   * True once the footer has scrolled into view. ExperienceStage folds
-   * this into Scene/Gate's own visibility the same way it already does
-   * for `contentVisible` — the fixed 3D stage covers the full viewport,
-   * so once the footer is genuinely on screen underneath it, the pad
+   * True once scroll has reached the notebook's own section (its runway
+   * placeholder is in view — see MainReveal). ExperienceStage folds this
+   * into Scene/Gate's own visibility the same way it already does for
+   * `contentVisible` — the fixed 3D stage covers the full viewport, so
+   * once the notebook is genuinely on screen underneath it, the pad
    * needs to be gone, whether or not it was ever flipped open. Scroll
    * progress alone can't drive this: it's clamped to 1 for the entire
    * rest of the page's height once the runway's done, so it can't tell
    * "just finished opening" from "scrolled three screens further" —
    * exactly the two moments that need different pad visibility here.
    */
-  footerVisible: boolean;
-  /** Wired up by Footer's own IntersectionObserver — not meant to be called from anywhere else. */
-  setFooterVisible: (visible: boolean) => void;
+  notebookReached: boolean;
+  /** Wired up by MainReveal's own IntersectionObserver — not meant to be called from anywhere else. */
+  setNotebookReached: (reached: boolean) => void;
   dispatchScroll: (progress: number) => void;
   /** Deliberate "turn the page" interaction — requires the cover to
    *  already be open (via scroll), animates pages open with a stagger. */
@@ -52,7 +53,7 @@ const RevealContext = createContext<RevealContextValue | null>(null);
 export function RevealProvider({ children }: { children: React.ReactNode }) {
   const [padState, dispatch] = useReducer(padStateReducer, initialPadState);
   const [contentVisible, setContentVisible] = useState(false);
-  const [footerVisible, setFooterVisible] = useState(false);
+  const [notebookReached, setNotebookReached] = useState(false);
   const reduced = useReducedMotion();
 
   // Scrolling back closes the pad (padState resets, flipped -> false) —
@@ -68,20 +69,20 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
 
   // Scrolling all the way past the pad without ever clicking "Turn the
   // page" is a real path (confirmed live: scrolling straight down with
-  // a mouse wheel, never clicking) — footerVisible correctly fades the
-  // pad out once the footer is genuinely on screen, but contentVisible
-  // only ever becomes true via an explicit flip/skip, so without this
-  // the visitor was left looking at empty space where the notebook
-  // should be: pad gone, content still permanently invisible. This
-  // reveals it in that case too, but doesn't scroll or move focus —
+  // a mouse wheel, never clicking) — notebookReached correctly fades the
+  // pad out once the notebook section is genuinely on screen, but
+  // contentVisible only ever becomes true via an explicit flip/skip, so
+  // without this the visitor was left looking at empty space where the
+  // notebook should be: pad gone, content still permanently invisible.
+  // This reveals it in that case too, but doesn't scroll or move focus —
   // the visitor already scrolled exactly where they meant to go; only
   // visibility needs to catch up, not the reverse.
   useEffect(() => {
-    if (!footerVisible || padState.flipped) return;
+    if (!notebookReached || padState.flipped) return;
     dispatch({ type: "SKIP_TO_REVEALED" });
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setContentVisible(true);
-  }, [footerVisible, padState.flipped]);
+  }, [notebookReached, padState.flipped]);
 
   // Closing the pad only resets coverOpen/flipped in the reducer —
   // pageTargets is deliberately left untouched there. This effect plays
@@ -162,8 +163,8 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
         revealed: padState.flipped,
         contentVisible,
         visualCoverOpen,
-        footerVisible,
-        setFooterVisible,
+        notebookReached,
+        setNotebookReached,
         dispatchScroll,
         flip,
         skipToRevealed,

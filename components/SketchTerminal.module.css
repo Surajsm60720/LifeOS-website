@@ -1,0 +1,47 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 150px;
+  aspect-ratio: 140 / 116;
+  overflow: visible;
+}
+
+.window, .bar, .dots {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dots circle {
+  fill: var(--ink-light);
+}
+.prompt {
+  stroke: var(--mint);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The cursor block blinks on repeat — the only motion, standing in for
+   a shell waiting on input rather than a static screenshot. */
+.cursor {
+  stroke: var(--mint);
+  stroke-linecap: square;
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; opacity: 1; }
+}

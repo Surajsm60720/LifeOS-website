@@ -20,7 +20,10 @@ export type SketchKind =
   | "quotaRing"
   | "splitReceipt"
   | "fileArrow"
-  | "markdownLines";
+  | "markdownLines"
+  | "gitBranch"
+  | "terminal"
+  | "noCloud";
 export type FeatureCard = {
   tag: string;
   dotVar: string;
@@ -29,6 +32,8 @@ export type FeatureCard = {
   sketch: SketchKind;
   /** Handwritten line under the sketch. */
   sketchCaption: string;
+  /** Real, clickable — only the closing page's "Source" card uses this. */
+  link?: { href: string; label: string };
 };
 export type FeatureSection = {
   id?: string;
@@ -216,15 +221,51 @@ export const featureSections: FeatureSection[] = [
   },
 ];
 
-export const footerEyebrow = "Build it yourself";
-export const footerBody =
-  "A personal project, not an App Store release. Clone the repo, open it in Xcode with your own signing team, and run it.";
-export const footerSmallLines = ["LifeOS v1.0.2", "Swift · SwiftUI · SwiftData", "Local-first by design"];
+// The closing page of the notebook — same card-row shape as every
+// feature section, so it turns like one of them rather than reading as
+// a bolted-on footer. Kept separate from featureSections (not a real
+// feature, and content.test.ts's per-section checks shouldn't have to
+// account for a page with no eyebrow/tag semantics in common with them).
+export const closingSection: FeatureSection = {
+  eyebrow: "Build it yourself",
+  heading: "Yours to clone and run.",
+  lede: "A personal project, not an App Store release — open it in Xcode with your own signing team, and it's yours.",
+  cards: [
+    {
+      tag: "Source",
+      dotVar: "--coral",
+      title: "Clone the repo",
+      body: "Full source, no signing keys or backend to stand up first.",
+      sketch: "gitBranch",
+      sketchCaption: "fork it —",
+      link: { href: repoUrl, label: repoUrl.replace("https://", "") },
+    },
+    {
+      tag: "Stack",
+      dotVar: "--mint",
+      title: "Swift, SwiftUI, SwiftData",
+      body: "iOS 18+, no third-party dependencies, 75 unit tests.",
+      sketch: "terminal",
+      sketchCaption: "built plainly —",
+    },
+    {
+      tag: "Data",
+      dotVar: "--violet",
+      title: "Local-first by design",
+      body: "v1.0.2 — no account, no server, nothing to sync.",
+      sketch: "noCloud",
+      sketchCaption: "stays on the phone —",
+    },
+  ],
+};
 
 // One notebook page per section — previously pages 2 and 3 each carried
 // two whole sections (7 and 5 cards) against page 1's 3, so the "book"
 // read as badly unbalanced. One-per-page gives 3/4/3/2/3 cards a page,
 // close enough to even that no page reads as the short one or the slog.
+// The closing page rides along as a sixth page in the same pagination —
+// there's no separate footer section any more, so nothing else needs to
+// know where the "book" actually ends.
 export type ContentPage = { label: string; sections: FeatureSection[] };
 
 export const contentPages: ContentPage[] = [
@@ -233,4 +274,5 @@ export const contentPages: ContentPage[] = [
   { label: "03", sections: [featureSections[2]] },
   { label: "04", sections: [featureSections[3]] },
   { label: "05", sections: [featureSections[4]] },
+  { label: "06", sections: [closingSection] },
 ];

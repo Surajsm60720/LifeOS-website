@@ -11,7 +11,7 @@ import { useReveal } from "./RevealProvider";
 export function ExperienceStage() {
   const { easedProgress, rawProgress, narrow } = useScrollProgress();
   const reduced = useReducedMotion();
-  const { padState, contentVisible, visualCoverOpen, footerVisible, dispatchScroll, flip } = useReveal();
+  const { padState, contentVisible, visualCoverOpen, notebookReached, dispatchScroll, flip } = useReveal();
 
   const gateAnchorElRef = useRef<HTMLDivElement>(null);
   const pageTargetsRef = useRef<number[]>(padState.pageTargets);
@@ -38,14 +38,14 @@ export function ExperienceStage() {
         easedProgress={easedProgress}
         narrow={narrow}
         reduced={reduced}
-        contentVisible={contentVisible || footerVisible}
+        contentVisible={contentVisible || notebookReached}
         pageTargetsRef={pageTargetsRef}
         coverTargetRef={coverTargetRef}
         gateAnchorElRef={gateAnchorElRef}
       />
       <Gate
         coverOpen={padState.coverOpen}
-        flipped={padState.flipped || footerVisible}
+        flipped={padState.flipped || notebookReached}
         anchorElRef={gateAnchorElRef}
         onFlipClick={flip}
       />
