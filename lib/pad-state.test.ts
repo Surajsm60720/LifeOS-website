@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { initialPadState, padStateReducer } from "./pad-state";
+import { initialPadState, padStateReducer, PAGE_OPEN_ANGLE } from "./pad-state";
 
 describe("padStateReducer", () => {
   it("starts closed and unflipped with all page targets at 0", () => {
@@ -62,5 +62,34 @@ describe("padStateReducer", () => {
   it("SET_PAGE_TARGET updates only the targeted page index", () => {
     const next = padStateReducer(initialPadState, { type: "SET_PAGE_TARGET", index: 2, value: -3 });
     expect(next.pageTargets).toEqual([0, 0, -3, 0]);
+  });
+
+  it("SKIP_TO_REVEALED forces cover open, flipped, and every page target open from a completely fresh state", () => {
+    const next = padStateReducer(initialPadState, { type: "SKIP_TO_REVEALED" });
+    expect(next.coverOpen).toBe(true);
+    expect(next.flipped).toBe(true);
+    expect(next.pageTargets).toEqual(new Array(4).fill(PAGE_OPEN_ANGLE));
+  });
+
+  it("SKIP_TO_REVEALED is a no-op once already flipped with every page fully open", () => {
+    const revealed = padStateReducer(initialPadState, { type: "SKIP_TO_REVEALED" });
+    const again = padStateReducer(revealed, { type: "SKIP_TO_REVEALED" });
+    expect(again).toEqual(revealed);
+  });
+
+  it("SKIP_TO_REVEALED still forces the stragglers open if flipped but a fast scroll caught the stagger mid-flight", () => {
+    // FLIP fired (flipped: true) but only page 0's stagger delay has
+    // elapsed so far — pages 1-3 are still sitting at their closed
+    // target of 0. A guard that only checked `flipped` used to treat
+    // this as "already done" and leave them there, letting the 3D
+    // spring keep easing them open underneath the crossfade — which is
+    // what read as the opening animation getting cut off mid-swing.
+    const open = padStateReducer(initialPadState, { type: "SCROLL_PROGRESS", progress: 0.9 });
+    const flipped = padStateReducer(open, { type: "FLIP" });
+    const partiallyStaggered = padStateReducer(flipped, { type: "SET_PAGE_TARGET", index: 0, value: PAGE_OPEN_ANGLE });
+    expect(partiallyStaggered.pageTargets).toEqual([PAGE_OPEN_ANGLE, 0, 0, 0]);
+
+    const forced = padStateReducer(partiallyStaggered, { type: "SKIP_TO_REVEALED" });
+    expect(forced.pageTargets).toEqual(new Array(4).fill(PAGE_OPEN_ANGLE));
   });
 });

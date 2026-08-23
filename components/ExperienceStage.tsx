@@ -29,13 +29,27 @@ export function ExperienceStage() {
     dispatchScroll(rawProgress);
   }, [rawProgress, dispatchScroll]);
 
+  // Once scroll has reached the notebook, the pad is going away
+  // regardless of how far its own opening animation got — a fast scroll
+  // can get there well inside the stagger+spring's own ~1s duration,
+  // and letting the spring keep easing toward it underneath the
+  // crossfade is what read as the animation getting cut off mid-swing
+  // (RevealProvider's SKIP_TO_REVEALED already forces any still-closed
+  // pageTargets open the moment this happens — see lib/pad-state.ts).
+  // Treating that same moment as reduced-motion makes Pages/Cover snap
+  // straight to the target instead of easing, so whatever's glimpsed
+  // during the crossfade is always the finished pose. Harmless the rest
+  // of the time: by a normal-paced scroll, the animation has long since
+  // settled at that same target anyway, so snapping to it changes nothing.
+  const instant = reduced || notebookReached;
+
   return (
     <>
       <div className={styles.runway} aria-hidden="true" />
       <Scene
         easedProgress={easedProgress}
         narrow={narrow}
-        reduced={reduced}
+        reduced={instant}
         contentVisible={contentVisible || notebookReached}
         pageTargetsRef={pageTargetsRef}
         coverTargetRef={coverTargetRef}

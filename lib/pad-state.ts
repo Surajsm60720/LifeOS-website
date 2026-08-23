@@ -51,10 +51,22 @@ export function padStateReducer(state: PadState, action: PadAction): PadState {
       // The hero's skip-intro link bypasses the 3D pad entirely — it
       // doesn't scroll through the open threshold, so it can't rely on
       // FLIP's coverOpen precondition. Force full-open state directly
-      // (cover open, pages at their open angle, no stagger) so Scene's
-      // visibility, driven by this same state, stays consistent
-      // regardless of which path revealed the content.
-      if (state.flipped) return state;
+      // (cover open, pages at their open angle) so Scene's visibility,
+      // driven by this same state, stays consistent regardless of which
+      // path revealed the content.
+      //
+      // Checking `flipped` alone to skip this used to be enough back
+      // when it was only reachable via a deliberate click or this same
+      // action — but a fast scroll can now reach notebookReached (see
+      // RevealProvider) while FLIP has fired but its own stagger hasn't
+      // finished distributing pageTargets yet (some still 0). Skipping
+      // in that case left those pages to keep easing open via spring
+      // physics underneath the crossfade, which is what read as the
+      // opening animation getting cut off mid-swing. Checking the
+      // targets themselves instead still no-ops once everything's
+      // genuinely settled, but correctly forces the stragglers open here.
+      const alreadyOpen = state.flipped && state.pageTargets.every((v) => v === PAGE_OPEN_ANGLE);
+      if (alreadyOpen) return state;
       return {
         coverOpen: true,
         flipped: true,
