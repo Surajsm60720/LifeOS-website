@@ -3,7 +3,6 @@
 // re-checking it against the LifeOS README v1.0.2 status table
 // (see the design spec, §0).
 
-export type ChipSegment = { text: string; bold?: boolean };
 /** Every card gets a hand-drawn accent in place of a photo — one Sketch* component per kind, dispatched in FeatureSection. */
 export type SketchKind =
   | "faceid"
@@ -42,18 +41,10 @@ export type FeatureSection = {
   lede?: string;
   cards: FeatureCard[];
 };
-export const heroEyebrow = "Version 1.0.2 · 17 Aug 2026";
+export const heroEyebrow = "Version 1.0.2";
 export const heroLede =
   "A calendar that holds your real life, your game cadence, and everything you're part-way through reading — in one entry model, on one device, with no account behind it.";
 export const scrollCueText = "Scroll to open";
-
-export const heroChips: ChipSegment[][] = [
-  [{ text: "iOS 18+", bold: true }],
-  [{ text: "SwiftUI · SwiftData" }],
-  [{ text: "Local-only" }],
-  [{ text: "Dark theme" }],
-  [{ text: "75", bold: true }, { text: " unit tests" }],
-];
 
 export const repoUrl = "https://github.com/Surajsm60720/LifeOS";
 
@@ -238,7 +229,7 @@ export const closingSection: FeatureSection = {
       tag: "Stack",
       dotVar: "--mint",
       title: "Swift, SwiftUI, SwiftData",
-      body: "iOS 18+, no third-party dependencies, 75 unit tests.",
+      body: "iOS 18+, no third-party dependencies.",
       sketch: "terminal",
       sketchCaption: "built plainly —",
     },

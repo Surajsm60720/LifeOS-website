@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./Hero.module.css";
-import { heroEyebrow, heroLede, heroChips, scrollCueText } from "@/lib/content";
+import { heroEyebrow, heroLede, scrollCueText } from "@/lib/content";
 import { useReveal } from "./RevealProvider";
 
 export function Hero() {
@@ -29,21 +29,6 @@ export function Hero() {
             Life<em>OS</em>
           </h1>
           <p className={styles.lede}>{heroLede}</p>
-          <div className={styles.chips}>
-            {heroChips.map((chip, i) => (
-              <span className={styles.chip} key={i}>
-                {chip.map((segment, j) =>
-                  segment.bold ? (
-                    <b className={styles.chipBold} key={j}>
-                      {segment.text}
-                    </b>
-                  ) : (
-                    <span key={j}>{segment.text}</span>
-                  )
-                )}
-              </span>
-            ))}
-          </div>
           <p className={styles.scrollCue}>
             <span className={styles.scrollCueMark} /> {scrollCueText}
           </p>

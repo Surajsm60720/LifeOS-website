@@ -1,18 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { heroChips, featureSections, contentPages, closingSection, repoUrl } from "./content";
-
-describe("hero chips", () => {
-  it("has exactly 5 chips, matching the v1.0.2 hero", () => {
-    expect(heroChips).toHaveLength(5);
-  });
-  it("has no empty chip text", () => {
-    for (const chip of heroChips) {
-      for (const segment of chip) {
-        expect(segment.text.trim().length).toBeGreaterThan(0);
-      }
-    }
-  });
-});
+import { featureSections, contentPages, closingSection, repoUrl } from "./content";
 
 describe("feature sections", () => {
   it("has 5 card-grid sections (features, time, notifications, places, data)", () => {

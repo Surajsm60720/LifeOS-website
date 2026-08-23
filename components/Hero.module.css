@@ -22,19 +22,6 @@
 }
 .wordmark em { font-style: normal; color: var(--coral); }
 .lede { font-size: clamp(1rem, 1.65vw, 1.2rem); line-height: 1.6; max-width: 46ch; color: var(--soft); }
-.chips { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: 1.8rem; }
-.chip {
-  font-family: var(--mono);
-  font-size: .685rem;
-  letter-spacing: .03em;
-  padding: .4rem .7rem;
-  border: 1px solid var(--stroke);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .025);
-  color: var(--soft);
-  white-space: nowrap;
-}
-.chipBold { color: var(--accent); font-weight: 400; }
 .scrollCue {
   margin-top: 2.6rem;
   font-family: var(--mono);
