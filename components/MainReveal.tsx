@@ -27,15 +27,24 @@ const SWIPE_THRESHOLD = 48;
  */
 const ENTRY_SETTLE_MS = 500;
 /**
- * A gap this long between wheel events marks the end of one scroll
- * gesture and the start of the next. Trackpad momentum keeps sending
- * events every 8-30ms as it decays, often for a second or more after a
- * strong flick — with nothing else stopping it, each one that still
- * clears WHEEL_THRESHOLD was calling goTo() on its own, cascading
- * through several pages (and occasionally reversing direction on a
- * stray sign-flip near the end of the decay) from a single flick.
+ * After a wheel-triggered page turn, further turns are blocked until
+ * this much time has passed — a fixed, self-expiring cooldown, not a
+ * "has the gesture paused yet" guess. An earlier version tried to reset
+ * on any >150ms gap between wheel events, on the theory that a gap
+ * means one gesture ended and a new one can begin; trackpad momentum
+ * doesn't reliably leave gaps that clean, though — it can keep sending
+ * events under that gap for a second or more, so a visitor's genuinely
+ * new, deliberate scroll made soon after landing on a page could arrive
+ * while the *previous* flick's tail was still technically "ongoing" by
+ * that test, and got silently swallowed — reads as scrolling having
+ * stopped working entirely. A flat cooldown timestamp instead guarantees
+ * scrolling is live again by a fixed, predictable point no matter what
+ * the wheel event stream looks like, while still absorbing most of a
+ * single flick's momentum tail (which is what was cascading through
+ * several pages at once, and occasionally reversing direction on a
+ * stray sign-flip near the end of the decay).
  */
-const GESTURE_IDLE_GAP_MS = 150;
+const ADVANCE_COOLDOWN_MS = 900;
 
 type PendingFocus = { behavior: ScrollBehavior } | null;
 
@@ -56,9 +65,8 @@ export function MainReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
   const runwayRef = useRef<HTMLDivElement>(null);
   const pendingFocusRef = useRef<PendingFocus>(null);
-  const enteredAtRef = useRef(0);
-  const lastWheelAtRef = useRef(0);
-  const gestureAdvancedRef = useRef(false);
+  /** Timestamp before which wheel-triggered turns are suppressed — see ENTRY_SETTLE_MS / ADVANCE_COOLDOWN_MS. */
+  const lockedUntilRef = useRef(0);
 
   const lastIndex = contentPages.length - 1;
 
@@ -137,11 +145,10 @@ export function MainReveal() {
     setNotebookReached(inView);
   }, [inView, setNotebookReached]);
 
-  // Timestamps the moment `inView` actually became true, so the wheel
-  // handler below can tell "just arrived" from "been sitting on this
-  // page for a while" — see ENTRY_SETTLE_MS.
+  // Arms the entry-settle lock the moment `inView` actually becomes
+  // true — see ENTRY_SETTLE_MS.
   useEffect(() => {
-    if (inView) enteredAtRef.current = performance.now();
+    if (inView) lockedUntilRef.current = performance.now() + ENTRY_SETTLE_MS;
   }, [inView]);
 
   // Decoupled from the hero/gate's "see the features" links via a DOM
@@ -201,15 +208,6 @@ export function MainReveal() {
   useEffect(() => {
     function onWheel(e: WheelEvent) {
       if (!inView) return;
-      const now = performance.now();
-      // A gap since the last wheel event means whatever gesture already
-      // turned a page (or didn't) is over — arm for a new one. Without
-      // resetting this, the very first event of an entirely new,
-      // deliberate flick would still be blocked by the previous
-      // gesture's flag.
-      if (now - lastWheelAtRef.current > GESTURE_IDLE_GAP_MS) gestureAdvancedRef.current = false;
-      lastWheelAtRef.current = now;
-
       const wantsNext = e.deltaY > 0;
       // At either end, do nothing at all — that lets the gesture fall
       // through to native scroll, carrying the visitor on into the
@@ -224,17 +222,12 @@ export function MainReveal() {
       if (wantsNext ? index === lastIndex : index === 0) return;
       e.preventDefault();
       if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
-      // Still absorbing the momentum that carried us into view — trap
-      // the scroll (already done above) but don't let it also count as
-      // a deliberate flick past the page that just appeared.
-      if (now - enteredAtRef.current < ENTRY_SETTLE_MS) return;
-      // One page turn per gesture — a strong flick's momentum tail can
-      // keep clearing WHEEL_THRESHOLD for a second or more, and each of
-      // those used to fire its own goTo(), cascading through several
-      // pages (or reversing on a stray sign-flip near the end of the
-      // decay) from what the visitor experienced as a single flick.
-      if (gestureAdvancedRef.current) return;
-      gestureAdvancedRef.current = true;
+      // Covers both the entry-settle window and the post-turn cooldown
+      // — see ADVANCE_COOLDOWN_MS. Trapping the scroll above but not
+      // advancing here is what swallows a flick's lingering momentum.
+      const now = performance.now();
+      if (now < lockedUntilRef.current) return;
+      lockedUntilRef.current = now + ADVANCE_COOLDOWN_MS;
       containerRef.current?.focus({ preventScroll: true });
       goTo(index + (wantsNext ? 1 : -1));
     }
