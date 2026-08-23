@@ -15,6 +15,17 @@ const TURN_MS = 620;
 const WHEEL_THRESHOLD = 4;
 /** Vertical touch travel needed before it counts as a deliberate swipe, not a tap or a jitter. */
 const SWIPE_THRESHOLD = 48;
+/**
+ * Swallow wheel-driven page advances for this long right after `inView`
+ * turns true. The scroll gesture that carries the visitor into the
+ * notebook is still sending momentum wheel events (a continuous stream,
+ * unrelated to how hard they actually flicked) at the exact moment the
+ * IntersectionObserver's callback flips `inView` — without this, the
+ * very next one of those already sees `inView === true` and immediately
+ * satisfies the deltaY threshold below, advancing straight to page two
+ * before the visitor has seen page one at all.
+ */
+const ENTRY_SETTLE_MS = 500;
 
 type PendingFocus = { behavior: ScrollBehavior } | null;
 
@@ -35,6 +46,7 @@ export function MainReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
   const runwayRef = useRef<HTMLDivElement>(null);
   const pendingFocusRef = useRef<PendingFocus>(null);
+  const enteredAtRef = useRef(0);
 
   const lastIndex = contentPages.length - 1;
 
@@ -113,6 +125,13 @@ export function MainReveal() {
     setNotebookReached(inView);
   }, [inView, setNotebookReached]);
 
+  // Timestamps the moment `inView` actually became true, so the wheel
+  // handler below can tell "just arrived" from "been sitting on this
+  // page for a while" — see ENTRY_SETTLE_MS.
+  useEffect(() => {
+    if (inView) enteredAtRef.current = performance.now();
+  }, [inView]);
+
   // Decoupled from the hero/gate's "see the features" links via a DOM
   // event, since focus-features.ts is a plain utility with no reference
   // to this component's state — it can ask for page 0 and a focus
@@ -184,6 +203,10 @@ export function MainReveal() {
       if (wantsNext ? index === lastIndex : index === 0) return;
       e.preventDefault();
       if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
+      // Still absorbing the momentum that carried us into view — trap
+      // the scroll (already done above) but don't let it also count as
+      // a deliberate flick past the page that just appeared.
+      if (performance.now() - enteredAtRef.current < ENTRY_SETTLE_MS) return;
       containerRef.current?.focus({ preventScroll: true });
       goTo(index + (wantsNext ? 1 : -1));
     }
