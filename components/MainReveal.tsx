@@ -26,6 +26,16 @@ const SWIPE_THRESHOLD = 48;
  * before the visitor has seen page one at all.
  */
 const ENTRY_SETTLE_MS = 500;
+/**
+ * A gap this long between wheel events marks the end of one scroll
+ * gesture and the start of the next. Trackpad momentum keeps sending
+ * events every 8-30ms as it decays, often for a second or more after a
+ * strong flick — with nothing else stopping it, each one that still
+ * clears WHEEL_THRESHOLD was calling goTo() on its own, cascading
+ * through several pages (and occasionally reversing direction on a
+ * stray sign-flip near the end of the decay) from a single flick.
+ */
+const GESTURE_IDLE_GAP_MS = 150;
 
 type PendingFocus = { behavior: ScrollBehavior } | null;
 
@@ -47,6 +57,8 @@ export function MainReveal() {
   const runwayRef = useRef<HTMLDivElement>(null);
   const pendingFocusRef = useRef<PendingFocus>(null);
   const enteredAtRef = useRef(0);
+  const lastWheelAtRef = useRef(0);
+  const gestureAdvancedRef = useRef(false);
 
   const lastIndex = contentPages.length - 1;
 
@@ -189,6 +201,15 @@ export function MainReveal() {
   useEffect(() => {
     function onWheel(e: WheelEvent) {
       if (!inView) return;
+      const now = performance.now();
+      // A gap since the last wheel event means whatever gesture already
+      // turned a page (or didn't) is over — arm for a new one. Without
+      // resetting this, the very first event of an entirely new,
+      // deliberate flick would still be blocked by the previous
+      // gesture's flag.
+      if (now - lastWheelAtRef.current > GESTURE_IDLE_GAP_MS) gestureAdvancedRef.current = false;
+      lastWheelAtRef.current = now;
+
       const wantsNext = e.deltaY > 0;
       // At either end, do nothing at all — that lets the gesture fall
       // through to native scroll, carrying the visitor on into the
@@ -206,7 +227,14 @@ export function MainReveal() {
       // Still absorbing the momentum that carried us into view — trap
       // the scroll (already done above) but don't let it also count as
       // a deliberate flick past the page that just appeared.
-      if (performance.now() - enteredAtRef.current < ENTRY_SETTLE_MS) return;
+      if (now - enteredAtRef.current < ENTRY_SETTLE_MS) return;
+      // One page turn per gesture — a strong flick's momentum tail can
+      // keep clearing WHEEL_THRESHOLD for a second or more, and each of
+      // those used to fire its own goTo(), cascading through several
+      // pages (or reversing on a stray sign-flip near the end of the
+      // decay) from what the visitor experienced as a single flick.
+      if (gestureAdvancedRef.current) return;
+      gestureAdvancedRef.current = true;
       containerRef.current?.focus({ preventScroll: true });
       goTo(index + (wantsNext ? 1 : -1));
     }
