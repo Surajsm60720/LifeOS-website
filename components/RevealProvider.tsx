@@ -4,18 +4,18 @@ import { createContext, useCallback, useContext, useEffect, useReducer, useRef, 
 import { padStateReducer, initialPadState, PAGE_OPEN_ANGLE, type PadState } from "@/lib/pad-state";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { focusFeatures } from "@/lib/focus-features";
-import { PAGE_FLIP_STAGGER_MS, PAGE_CLOSE_HOLD_MS, PAGE_REVEAL_MS, PAGE_COUNT } from "@/lib/constants";
+import { PAGE_FLIP_STAGGER_MS, PAGE_CLOSE_HOLD_MS, PAGE_COUNT, AUTO_FLIP_DELAY_MS } from "@/lib/constants";
 
 type RevealContextValue = {
   padState: PadState;
-  /** True exactly when padState.flipped is — used for Gate, which must
-   *  hide the instant you click (or skip), not wait on any animation. */
+  /** True exactly when padState.flipped is. */
   revealed: boolean;
-  /** True once the page-flip animation has actually finished (or
-   *  immediately, for skipToRevealed's instant path) — MainReveal and
-   *  Scene key their crossfade off this, not `revealed`, so the content
-   *  page doesn't fade in over the pad while it's still mid-flip. Goes
-   *  false the instant the pad closes, same as `revealed`. */
+  /** True once the visitor's own scroll has actually reached the
+   *  notebook (or immediately, for skipToRevealed's instant path) —
+   *  MainReveal and Scene key their crossfade off this, not `revealed`,
+   *  so the content page doesn't fade in — or the pad fade out — ahead
+   *  of where the visitor has actually scrolled to. Goes false the
+   *  instant the pad closes, same as `revealed`. */
   contentVisible: boolean;
   /** What Cover.tsx should actually animate toward — mirrors
    *  padState.coverOpen except when closing from a flipped state: then
@@ -24,26 +24,29 @@ type RevealContextValue = {
   visualCoverOpen: boolean;
   /**
    * True once scroll has reached the notebook's own section (its runway
-   * placeholder is in view — see MainReveal). ExperienceStage folds this
-   * into Scene/Gate's own visibility the same way it already does for
-   * `contentVisible` — the fixed 3D stage covers the full viewport, so
-   * once the notebook is genuinely on screen underneath it, the pad
-   * needs to be gone, whether or not it was ever flipped open. Scroll
-   * progress alone can't drive this: it's clamped to 1 for the entire
-   * rest of the page's height once the runway's done, so it can't tell
-   * "just finished opening" from "scrolled three screens further" —
-   * exactly the two moments that need different pad visibility here.
+   * placeholder is in view — see MainReveal). Folds into Scene/Pad's own
+   * visibility the same way `contentVisible` does — the fixed 3D stage
+   * covers the full viewport, so once the notebook is genuinely on
+   * screen underneath it, the pad needs to be gone, whether or not the
+   * page-flip ever finished. Scroll progress alone can't drive this:
+   * it's clamped to 1 for the entire rest of the page's height once the
+   * runway's done, so it can't tell "just finished opening" from
+   * "scrolled three screens further" — exactly the two moments that
+   * need different pad visibility here.
    */
   notebookReached: boolean;
   /** Wired up by MainReveal's own IntersectionObserver — not meant to be called from anywhere else. */
   setNotebookReached: (reached: boolean) => void;
   dispatchScroll: (progress: number) => void;
-  /** Deliberate "turn the page" interaction — requires the cover to
-   *  already be open (via scroll), animates pages open with a stagger. */
+  /** Animates the pad's pages open with a stagger — purely the 3D flip,
+   *  not the content crossfade (that stays gated on notebookReached, so
+   *  a visitor who pauses right after the cover opens isn't left with a
+   *  bare pad and nothing revealed behind it). Auto-triggered a beat
+   *  after the cover opens, below; there's no button any more. */
   flip: () => void;
   /** Accessibility bypass (hero's skip-intro link) — jumps straight to
    *  revealed content without depending on scroll position, forcing the
-   *  pad into a consistent fully-open state so Gate/Scene never desync
+   *  pad into a consistent fully-open state so Pad/Scene never desync
    *  from what's actually on screen. */
   skipToRevealed: () => void;
 };
@@ -57,32 +60,15 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
   const reduced = useReducedMotion();
 
   // Scrolling back closes the pad (padState resets, flipped -> false) —
-  // the content crossfade must follow that immediately, same as Gate
-  // does. This genuinely isn't derivable during render: contentVisible
-  // tracks padState.flipped asymmetrically (closes in lockstep, but
-  // opens later, from the delayed setTimeout in flip() below) — so it
-  // needs its own state that's reset here, not computed inline.
+  // the content crossfade must follow that immediately. This genuinely
+  // isn't derivable during render: contentVisible tracks padState.flipped
+  // asymmetrically (closes in lockstep, but opens later, gated on
+  // notebookReached below) — so it needs its own state that's reset
+  // here, not computed inline.
   useEffect(() => {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     if (!padState.flipped) setContentVisible(false);
   }, [padState.flipped]);
-
-  // Scrolling all the way past the pad without ever clicking "Turn the
-  // page" is a real path (confirmed live: scrolling straight down with
-  // a mouse wheel, never clicking) — notebookReached correctly fades the
-  // pad out once the notebook section is genuinely on screen, but
-  // contentVisible only ever becomes true via an explicit flip/skip, so
-  // without this the visitor was left looking at empty space where the
-  // notebook should be: pad gone, content still permanently invisible.
-  // This reveals it in that case too, but doesn't scroll or move focus —
-  // the visitor already scrolled exactly where they meant to go; only
-  // visibility needs to catch up, not the reverse.
-  useEffect(() => {
-    if (!notebookReached || padState.flipped) return;
-    dispatch({ type: "SKIP_TO_REVEALED" });
-    /* eslint-disable-next-line react-hooks/set-state-in-effect */
-    setContentVisible(true);
-  }, [notebookReached, padState.flipped]);
 
   // Closing the pad only resets coverOpen/flipped in the reducer —
   // pageTargets is deliberately left untouched there. This effect plays
@@ -136,19 +122,36 @@ export function RevealProvider({ children }: { children: React.ReactNode }) {
       const delay = reduced ? 0 : i * PAGE_FLIP_STAGGER_MS;
       setTimeout(() => dispatch({ type: "SET_PAGE_TARGET", index: i, value: PAGE_OPEN_ANGLE }), delay);
     }
-    // Don't crossfade to content until the last page has actually swung
-    // out of frame, rather than firing at click time and racing the
-    // still-mid-flip 3D animation. Same delay gates the focus move.
-    const revealDelay = reduced ? 0 : PAGE_REVEAL_MS;
-    setTimeout(() => {
-      setContentVisible(true);
-      // "instant", not "auto" — the page sets `scroll-behavior: smooth`
-      // globally, and per spec CSS wins over a JS "auto" argument, so
-      // "auto" here would silently animate anyway. Only "instant"
-      // actually bypasses it.
-      focusFeatures(reduced ? "instant" : "smooth");
-    }, revealDelay);
   }, [reduced]);
+
+  // Cover opening used to just show a "Turn the page" prompt and wait
+  // for a click. Removed for a seamless scroll-only experience: the
+  // pages now flip open on their own, a beat after the cover finishes
+  // its swing — purely the visual animation, triggered eagerly since it
+  // doesn't hide anything. Crossfading to content and moving focus stay
+  // gated on notebookReached (below), not on this: a visitor who pauses
+  // scrolling right after the cover opens would otherwise be left
+  // staring at a pad that's already faded away with nothing behind it
+  // yet — the exact "blank gap" bug fixed once already, this time from
+  // a scroll-progress trigger instead of a click.
+  useEffect(() => {
+    if (!padState.coverOpen || padState.flipped) return;
+    const timer = setTimeout(() => flip(), reduced ? 0 : AUTO_FLIP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [padState.coverOpen, padState.flipped, flip, reduced]);
+
+  // The visitor's own scroll arriving at the notebook is what actually
+  // reveals content and moves focus — not the page-flip animation above,
+  // which can run well ahead of that (or not at all, if reduced motion
+  // skips straight to the open state). Mirrors skipToRevealed's instant
+  // path, but without the scroll: the visitor already scrolled exactly
+  // where they meant to go, only visibility needs to catch up.
+  useEffect(() => {
+    if (!notebookReached || contentVisible) return;
+    dispatch({ type: "SKIP_TO_REVEALED" });
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setContentVisible(true);
+  }, [notebookReached, contentVisible]);
 
   const skipToRevealed = useCallback(() => {
     dispatch({ type: "SKIP_TO_REVEALED" });

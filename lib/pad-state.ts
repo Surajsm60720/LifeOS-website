@@ -26,9 +26,9 @@ export function padStateReducer(state: PadState, action: PadAction): PadState {
       if (!state.coverOpen && !state.flipped && action.progress >= COVER_OPEN_THRESHOLD) {
         return { ...state, coverOpen: true };
       }
-      // Scrolling back closes the cover/flipped flags immediately — Gate
-      // and the content crossfade both key off these and must react
-      // right away. pageTargets is deliberately left as-is here, not
+      // Scrolling back closes the cover/flipped flags immediately — the
+      // content crossfade keys off these and must react right away.
+      // pageTargets is deliberately left as-is here, not
       // zeroed: RevealProvider watches flipped's true->false edge and
       // staggers them closed itself (mirroring flip()'s staggered open),
       // so the pages visibly shut one at a time instead of all snapping
@@ -51,9 +51,9 @@ export function padStateReducer(state: PadState, action: PadAction): PadState {
       // The hero's skip-intro link bypasses the 3D pad entirely — it
       // doesn't scroll through the open threshold, so it can't rely on
       // FLIP's coverOpen precondition. Force full-open state directly
-      // (cover open, pages at their open angle, no stagger) so Gate/
-      // Scene visibility — both driven by this same state — stay
-      // consistent regardless of which path revealed the content.
+      // (cover open, pages at their open angle, no stagger) so Scene's
+      // visibility, driven by this same state, stays consistent
+      // regardless of which path revealed the content.
       if (state.flipped) return state;
       return {
         coverOpen: true,

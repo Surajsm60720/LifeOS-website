@@ -55,12 +55,6 @@ export const heroChips: ChipSegment[][] = [
   [{ text: "75", bold: true }, { text: " unit tests" }],
 ];
 
-export const gateScrawl = "planned on paper first —";
-export const gateHeading = "Want to see what's actually inside?";
-export const gateBody =
-  "Every feature listed past this page is built and shipping in 1.0.2. Nothing aspirational.";
-export const gateFlipLabel = "Turn the page →";
-export const gateSourceLabel = "View the source";
 export const repoUrl = "https://github.com/Surajsm60720/LifeOS";
 
 export const featureSections: FeatureSection[] = [

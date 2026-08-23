@@ -60,7 +60,7 @@ describe("RevealProvider", () => {
     expect(screen.getByTestId("state")).toHaveTextContent("revealed");
   });
 
-  it("flip reveals `revealed` (Gate hides) instantly, but delays `contentVisible` until the page-flip animation finishes", () => {
+  it("flip reveals `revealed` instantly, but content stays hidden until the visitor's own scroll actually reaches the notebook", () => {
     vi.useFakeTimers();
     render(
       <RevealProvider>
@@ -69,14 +69,58 @@ describe("RevealProvider", () => {
     );
     act(() => fireEvent.click(screen.getByText("scroll-in")));
     act(() => fireEvent.click(screen.getByText("flip")));
-    // Gate must hide immediately — no waiting on the 3D animation.
     expect(screen.getByTestId("state")).toHaveTextContent("revealed");
-    // But the content crossfade must not have started yet.
-    expect(screen.getByTestId("content")).toHaveTextContent("hidden");
+    // The content crossfade must not start on flip() alone, even after
+    // plenty of time passes — flip() is now purely the pad's own 3D
+    // animation. Otherwise a visitor who pauses scrolling right after
+    // the cover opens would see the pad vanish with nothing revealed
+    // behind it yet (the notebook only becomes visible once its own
+    // section is actually scrolled to).
     act(() => {
       vi.advanceTimersByTime(5000);
     });
+    expect(screen.getByTestId("content")).toHaveTextContent("hidden");
+    // Only once the visitor's scroll genuinely arrives does it reveal.
+    act(() => fireEvent.click(screen.getByText("notebook-in")));
     expect(screen.getByTestId("content")).toHaveTextContent("visible");
+  });
+
+  it("auto-flips the pad open on its own once the cover opens — no click needed", () => {
+    vi.useFakeTimers();
+    render(
+      <RevealProvider>
+        <Probe />
+      </RevealProvider>
+    );
+    act(() => fireEvent.click(screen.getByText("scroll-in")));
+    // Immediately after crossing the threshold, nothing has flipped yet
+    // — there's a deliberate beat so it doesn't race the cover's own
+    // opening swing.
+    expect(screen.getByTestId("state")).toHaveTextContent("hidden");
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    // No "flip" click anywhere in this test — scrolling in alone did it.
+    expect(screen.getByTestId("state")).toHaveTextContent("revealed");
+    expect(screen.getByTestId("pageTargets").textContent?.split(",").every((v) => v !== "0")).toBe(true);
+  });
+
+  it("cancels the pending auto-flip if scroll leaves the cover-open range before it fires", () => {
+    vi.useFakeTimers();
+    render(
+      <RevealProvider>
+        <Probe />
+      </RevealProvider>
+    );
+    act(() => fireEvent.click(screen.getByText("scroll-in")));
+    act(() => fireEvent.click(screen.getByText("scroll-back")));
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    // The auto-flip timer scheduled by the first click must have been
+    // cancelled, not merely delayed — otherwise it fires late, after the
+    // visitor has already scrolled back out.
+    expect(screen.getByTestId("state")).toHaveTextContent("hidden");
   });
 
   it("scrolling back out after flip closes everything again — reversible", () => {

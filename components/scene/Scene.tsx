@@ -15,7 +15,6 @@ type SceneProps = {
   contentVisible: boolean;
   pageTargetsRef: React.RefObject<number[]>;
   coverTargetRef: React.RefObject<number>;
-  gateAnchorElRef: React.RefObject<HTMLDivElement | null>;
 };
 
 function getDprCap(): number {
@@ -110,7 +109,6 @@ export function Scene(props: SceneProps) {
             pageTargetsRef={props.pageTargetsRef}
             coverTargetRef={props.coverTargetRef}
             onCoverLoaded={() => setReady(true)}
-            gateAnchorElRef={props.gateAnchorElRef}
           />
         </Suspense>
       </Canvas>

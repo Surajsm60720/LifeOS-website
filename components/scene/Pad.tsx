@@ -6,7 +6,6 @@ import * as THREE from "three";
 import { Pages } from "./Pages";
 import { Cover } from "./Cover";
 import { Rings } from "./Rings";
-import { usePadAnchor } from "@/hooks/usePadAnchor";
 
 const W = 3.05;
 const H = 3.85;
@@ -18,7 +17,6 @@ type PadProps = {
   pageTargetsRef: React.RefObject<number[]>;
   coverTargetRef: React.RefObject<number>;
   onCoverLoaded: () => void;
-  gateAnchorElRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export function Pad({
@@ -28,7 +26,6 @@ export function Pad({
   pageTargetsRef,
   coverTargetRef,
   onCoverLoaded,
-  gateAnchorElRef,
 }: PadProps) {
   const { camera } = useThree();
   const padRef = useRef<THREE.Group>(null);
@@ -37,8 +34,6 @@ export function Pad({
 
   const boardMaterial = useMemo(() => new THREE.MeshStandardMaterial({ color: 0x1c1c1f, roughness: 0.88, metalness: 0.05 }), []);
   const boardGeometry = useMemo(() => new THREE.BoxGeometry(W, H, 0.16), []);
-
-  usePadAnchor(padRef, gateAnchorElRef);
 
   // Per-frame imperative transform updates are the standard R3F animation
   // pattern: `pad`/`camera` are three.js objects mutated outside React's

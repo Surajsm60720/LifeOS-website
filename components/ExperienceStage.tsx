@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import styles from "./ExperienceStage.module.css";
 import { Scene } from "./scene/Scene";
-import { Gate } from "./Gate";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useReveal } from "./RevealProvider";
@@ -11,9 +10,8 @@ import { useReveal } from "./RevealProvider";
 export function ExperienceStage() {
   const { easedProgress, rawProgress, narrow } = useScrollProgress();
   const reduced = useReducedMotion();
-  const { padState, contentVisible, visualCoverOpen, notebookReached, dispatchScroll, flip } = useReveal();
+  const { padState, contentVisible, visualCoverOpen, notebookReached, dispatchScroll } = useReveal();
 
-  const gateAnchorElRef = useRef<HTMLDivElement>(null);
   const pageTargetsRef = useRef<number[]>(padState.pageTargets);
   const coverTargetRef = useRef<number>(0);
 
@@ -41,13 +39,6 @@ export function ExperienceStage() {
         contentVisible={contentVisible || notebookReached}
         pageTargetsRef={pageTargetsRef}
         coverTargetRef={coverTargetRef}
-        gateAnchorElRef={gateAnchorElRef}
-      />
-      <Gate
-        coverOpen={padState.coverOpen}
-        flipped={padState.flipped || notebookReached}
-        anchorElRef={gateAnchorElRef}
-        onFlipClick={flip}
       />
     </>
   );

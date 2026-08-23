@@ -21,7 +21,7 @@ type CoverProps = {
   targetRef: React.RefObject<number>;
   reduced: boolean;
   onLoaded: () => void;
-  /** Ref to the hinge Object3D — consumed by usePadAnchor in Pad.tsx to anchor the DOM gate. */
+  /** Ref to the hinge Object3D — shared with Pages.tsx so pages swing from the same pivot the cover does. */
   hingeRef: React.RefObject<THREE.Object3D | null>;
 };
 

@@ -75,7 +75,7 @@ export function MainReveal() {
   // YOURSELF" visible in the same frame, which is only possible if the
   // block actually on screen is shorter than the real viewport.
   //
-  // Fixed the same way Scene/Gate already solve this exact problem for
+  // Fixed the same way Scene already solves this exact problem for
   // the 3D pad: the thing that's actually visible is `position: fixed;
   // inset: 0`, which is unambiguous about matching the real viewport no
   // matter what scroll position got you there. `.runway` below is a
@@ -107,7 +107,7 @@ export function MainReveal() {
   // Notebook is now the last section in the document — no separate
   // footer after it to independently report "we're past the pad". This
   // forwards the same local `inView` signal into RevealProvider so
-  // Scene/Gate can hide once scroll reaches here, whether or not the
+  // Scene can hide the pad once scroll reaches here, whether or not the
   // pad was ever explicitly flipped open (see notebookReached there).
   useEffect(() => {
     setNotebookReached(inView);
