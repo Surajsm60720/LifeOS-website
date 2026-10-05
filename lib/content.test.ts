@@ -37,6 +37,15 @@ describe("feature sections", () => {
     expect(new Set(kinds).size).toBe(kinds.length);
   });
 
+  it("the pity card is the v1.0.3 wish counter, with its own drawing", () => {
+    const pity = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "Pity");
+    expect(pity?.sketch).toBe("pityRamp");
+    expect(pity?.title).toBe("The session, counted");
+    expect(pity?.body).toContain("Genshin");
+    expect(pity?.body).toContain("Star Rail");
+    expect(pity?.body).toContain("Wuthering Waves");
+  });
+
   it("the App Lock entry draws Face ID rather than reserving a photo slot", () => {
     const appLock = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "App Lock");
     expect(appLock?.sketch).toBe("faceid");

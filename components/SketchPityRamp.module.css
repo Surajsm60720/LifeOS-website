@@ -1,0 +1,195 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 148px;
+  aspect-ratio: 140 / 124;
+  overflow: visible;
+}
+
+.count {
+  font-family: var(--hand);
+  font-size: 40px;
+  text-anchor: middle;
+  opacity: 0;
+}
+
+.early {
+  fill: var(--game);
+  animation: beat-early 7s ease-in-out infinite;
+}
+
+.mid {
+  fill: var(--gold);
+  animation: beat-mid 7s ease-in-out infinite;
+}
+
+.hot {
+  fill: var(--coral);
+  animation: beat-hot 7s ease-in-out infinite;
+}
+
+.plus,
+.plusTen {
+  font-family: var(--hand);
+  font-size: 15px;
+  fill: var(--ink-light);
+  opacity: 0;
+}
+
+.plus { animation: flash-plus 7s ease-in-out infinite; }
+.plusTen { animation: flash-ten 7s ease-in-out infinite; }
+
+.pull {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  fill: var(--game);
+  animation-duration: 7s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.d, .e { fill: var(--coral); }
+.a { animation-name: pop-a; }
+.b { animation-name: pop-b; }
+.c { animation-name: pop-c; }
+.d { animation-name: pop-d; }
+.e { animation-name: pop-e; }
+
+.star {
+  fill: var(--gold);
+  stroke: var(--ink-light);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: 7s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.s1 { animation-name: star-1; }
+.s2 { animation-name: star-2; }
+.s3 { animation-name: star-3; }
+.s4 { animation-name: star-4; }
+.s5 { animation-name: star-5; }
+
+/* One session: a single pull, a ten-pull, the count heating, then five
+   stars. Every layer is gone again at both ends of the loop. */
+@keyframes beat-early {
+  0%, 4% { opacity: 0; }
+  10%, 22% { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
+@keyframes beat-mid {
+  0%, 22% { opacity: 0; }
+  30%, 46% { opacity: 1; }
+  54%, 100% { opacity: 0; }
+}
+
+@keyframes beat-hot {
+  0%, 46% { opacity: 0; }
+  54%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes flash-plus {
+  0%, 8% { opacity: 0; }
+  14%, 22% { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
+@keyframes flash-ten {
+  0%, 28% { opacity: 0; }
+  34%, 44% { opacity: 1; }
+  52%, 100% { opacity: 0; }
+}
+
+@keyframes pop-a {
+  0%, 4% { opacity: 0; transform: scale(.4); }
+  10% { opacity: 1; transform: scale(1.12); }
+  16%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.5); }
+}
+
+@keyframes pop-b {
+  0%, 12% { opacity: 0; transform: scale(.4); }
+  18% { opacity: 1; transform: scale(1.12); }
+  24%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.5); }
+}
+
+@keyframes pop-c {
+  0%, 28% { opacity: 0; transform: scale(.4); }
+  34% { opacity: 1; transform: scale(1.12); }
+  40%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.5); }
+}
+
+@keyframes pop-d {
+  0%, 36% { opacity: 0; transform: scale(.4); }
+  42% { opacity: 1; transform: scale(1.12); }
+  48%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.5); }
+}
+
+@keyframes pop-e {
+  0%, 48% { opacity: 0; transform: scale(.4); }
+  54% { opacity: 1; transform: scale(1.12); }
+  60%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.5); }
+}
+
+/* 76 is already up (from 54%). The row fills only after that. */
+@keyframes star-1 {
+  0%, 64% { opacity: 0; transform: scale(.3); }
+  68% { opacity: 1; transform: scale(1.15); }
+  72%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+@keyframes star-2 {
+  0%, 68% { opacity: 0; transform: scale(.3); }
+  72% { opacity: 1; transform: scale(1.15); }
+  76%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+@keyframes star-3 {
+  0%, 72% { opacity: 0; transform: scale(.3); }
+  76% { opacity: 1; transform: scale(1.15); }
+  80%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+@keyframes star-4 {
+  0%, 76% { opacity: 0; transform: scale(.3); }
+  80% { opacity: 1; transform: scale(1.15); }
+  84%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+@keyframes star-5 {
+  0%, 80% { opacity: 0; transform: scale(.3); }
+  84% { opacity: 1; transform: scale(1.15); }
+  88%, 92% { opacity: 1; transform: scale(1); }
+  98%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .early, .mid, .plus, .plusTen { animation: none; opacity: 0; }
+  .hot, .star, .pull {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

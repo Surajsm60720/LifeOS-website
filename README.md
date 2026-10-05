@@ -42,4 +42,4 @@ Optional: set `NEXT_PUBLIC_SITE_URL` to your custom domain if you use one. Witho
 
 ## Content policy
 
-All feature copy is transcribed from the [LifeOS](https://github.com/Surajsm60720/LifeOS) README's status table at v1.0.2. Do not add or reword a feature claim without re-verifying it against that README — see the design spec §0.
+Feature cards through v1.0.2 are transcribed from the [LifeOS](https://github.com/Surajsm60720/LifeOS) README's status table. The pity-counter card was checked against that README's v1.0.3 "What's new" section. Do not add or reword a feature claim without re-verifying it against that README — see the design spec §0.

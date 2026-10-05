@@ -1,7 +1,7 @@
-// All copy below is transcribed verbatim from the v1.0.2-verified
-// index.html build. Do not add, reword, or expand any entry without
-// re-checking it against the LifeOS README v1.0.2 status table
-// (see the design spec, §0).
+// Cards through v1.0.2 are transcribed verbatim from that verified
+// index.html build. The pity-counter card was checked against the
+// LifeOS README at v1.0.3 ("What's new"). Do not add, reword, or expand
+// any entry without re-checking that README (see the design spec, §0).
 
 /** Every card gets a hand-drawn accent in place of a photo — one Sketch* component per kind, dispatched in FeatureSection. */
 export type SketchKind =
@@ -12,6 +12,7 @@ export type SketchKind =
   | "swipeRow"
   | "durationBar"
   | "pulseRow"
+  | "pityRamp"
   | "quietProgress"
   | "windowFill"
   | "loopMarker"
@@ -73,6 +74,14 @@ export const featureSections: FeatureSection[] = [
         body: "Dailies, weeklies, banners, patches, livestreams, in-game events — typed per title for Genshin, Star Rail and Wuthering Waves. Other games get a session log instead.",
         sketch: "pulseRow",
         sketchCaption: "same time, every time —",
+      },
+      {
+        tag: "Pity",
+        dotVar: "--game",
+        title: "The session, counted",
+        body: "A live wish count for Genshin, Star Rail and Wuthering Waves. It heats up as you close in on hard pity.",
+        sketch: "pityRamp",
+        sketchCaption: "still counting —",
       },
       {
         tag: "Entertainment",
@@ -248,7 +257,7 @@ export const closingSection: FeatureSection = {
 
 // One notebook page per section — previously pages 2 and 3 each carried
 // two whole sections (7 and 5 cards) against page 1's 3, so the "book"
-// read as badly unbalanced. One-per-page gives 3/4/3/2/3 cards a page,
+// read as badly unbalanced. One-per-page gives 4/4/3/2/3 cards a page,
 // close enough to even that no page reads as the short one or the slog.
 // The closing page rides along as a sixth page in the same pagination —
 // there's no separate footer section any more, so nothing else needs to

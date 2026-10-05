@@ -7,6 +7,7 @@ import { SketchMapPin } from "./SketchMapPin";
 import { SketchSwipeRow } from "./SketchSwipeRow";
 import { SketchDurationBar } from "./SketchDurationBar";
 import { SketchPulseRow } from "./SketchPulseRow";
+import { SketchPityRamp } from "./SketchPityRamp";
 import { SketchQuietProgress } from "./SketchQuietProgress";
 import { SketchWindowFill } from "./SketchWindowFill";
 import { SketchLoopMarker } from "./SketchLoopMarker";
@@ -36,6 +37,8 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
       return <SketchDurationBar caption={card.sketchCaption} />;
     case "pulseRow":
       return <SketchPulseRow caption={card.sketchCaption} />;
+    case "pityRamp":
+      return <SketchPityRamp caption={card.sketchCaption} />;
     case "quietProgress":
       return <SketchQuietProgress caption={card.sketchCaption} />;
     case "windowFill":
