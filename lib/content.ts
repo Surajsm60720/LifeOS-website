@@ -41,7 +41,9 @@ export type FeatureSection = {
   lede?: string;
   cards: FeatureCard[];
 };
-export const heroEyebrow = "Version 1.0.2";
+/** Displayed LifeOS marketing version. The weekly sync may replace only this string. */
+export const appVersion = "1.0.2";
+export const heroEyebrow = `Version ${appVersion}`;
 export const heroLede =
   "A calendar that holds your real life, your game cadence, and everything you're part-way through reading — in one entry model, on one device, with no account behind it.";
 export const scrollCueText = "Scroll to open";
@@ -237,7 +239,7 @@ export const closingSection: FeatureSection = {
       tag: "Data",
       dotVar: "--violet",
       title: "Local-first by design",
-      body: "v1.0.2 — no account, no server, nothing to sync.",
+      body: `v${appVersion} — no account, no server, nothing to sync.`,
       sketch: "noCloud",
       sketchCaption: "stays on the phone —",
     },

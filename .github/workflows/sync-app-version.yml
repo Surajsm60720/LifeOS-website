@@ -1,0 +1,49 @@
+name: Sync app version
+
+on:
+  schedule:
+    # Monday 03:00 UTC is 08:30 IST. GitHub may start the run a few minutes late.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-app-version
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compare the site with the LifeOS marketing version
+        id: sync
+        env:
+          PR_BODY_PATH: ${{ runner.temp }}/sync-app-version-pr.md
+        run: node scripts/sync-app-version.mjs
+
+      - name: Require a sync result
+        if: steps.sync.outputs.changed != 'true' && steps.sync.outputs.changed != 'false'
+        run: |
+          echo "The sync script did not report whether the version changed."
+          exit 1
+
+      - name: Open or update the version pull request
+        if: steps.sync.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: sync/app-version
+          commit-message: "Bump displayed LifeOS version to ${{ steps.sync.outputs.version }}"
+          title: "Bump displayed LifeOS version to ${{ steps.sync.outputs.version }}"
+          body-path: ${{ runner.temp }}/sync-app-version-pr.md
+          add-paths: lib/content.ts
+          delete-branch: true

@@ -1,0 +1,14 @@
+---
+description: Where the LifeOS app version lives and what the weekly sync may edit
+alwaysApply: true
+---
+
+# LifeOS app version
+
+The app version is `MARKETING_VERSION` in `project.yml` on `main` of https://github.com/Surajsm60720/LifeOS. The app target and the Live Activity target must carry the same value. The README line `**Version X.Y.Z**` must match it. Release notes are the `## What's new in vX.Y.Z` sections in that README. This site has no changelog file, and the app repo has no GitHub Releases.
+
+On this site, the only displayed version is `appVersion` in `lib/content.ts`. `heroEyebrow` and the closing local-first card body are derived from it. Do not hardcode a second copy.
+
+`.github/workflows/sync-app-version.yml` runs Monday 08:30 IST and on demand. It may replace only the `appVersion` string, then open a pull request. It must not edit feature cards, sketches, the README "copy verified at" line, migration docs, `package.json`, or the promo video.
+
+When a release adds a feature, update the feature copy by hand. Merging the version pull request is what publishes the new number.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { featureSections, contentPages, closingSection, repoUrl } from "./content";
+import { appVersion, heroEyebrow, featureSections, contentPages, closingSection, repoUrl } from "./content";
 
 describe("feature sections", () => {
   it("has 5 card-grid sections (features, time, notifications, places, data)", () => {
@@ -66,6 +66,12 @@ describe("content pages", () => {
 });
 
 describe("closing section", () => {
+  it("shows the app version from the single appVersion constant", () => {
+    expect(heroEyebrow).toBe(`Version ${appVersion}`);
+    const localFirst = closingSection.cards.find((c) => c.tag === "Data");
+    expect(localFirst?.body).toBe(`v${appVersion} — no account, no server, nothing to sync.`);
+  });
+
   it("has no empty title/body/tag on any card", () => {
     for (const card of closingSection.cards) {
       expect(card.tag.trim().length).toBeGreaterThan(0);
