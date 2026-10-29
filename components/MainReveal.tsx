@@ -279,6 +279,9 @@ export function MainReveal() {
 
   const page = contentPages[index];
   const visible = contentVisible && inView;
+  const cardCount = page.sections.reduce((n, section) => n + section.cards.length, 0);
+  const density =
+    cardCount >= 5 ? "crowded" : cardCount >= 4 ? "dense" : cardCount === 3 ? "sparse" : undefined;
 
   return (
     <>
@@ -295,7 +298,7 @@ export function MainReveal() {
         onTouchEnd={handleTouchEnd}
         onKeyDown={handleKeyDown}
       >
-        <ContentPage key={page.label} label={page.label}>
+        <ContentPage key={page.label} label={page.label} density={density}>
           {page.sections.map((section) => (
             <FeatureSection section={section} key={section.heading} />
           ))}

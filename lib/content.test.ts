@@ -37,13 +37,30 @@ describe("feature sections", () => {
     expect(new Set(kinds).size).toBe(kinds.length);
   });
 
-  it("the pity card is the v1.0.3 wish counter, with its own drawing", () => {
+  it("the pity card is the wish counter, with its own drawing", () => {
     const pity = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "Pity");
     expect(pity?.sketch).toBe("pityRamp");
     expect(pity?.title).toBe("The session, counted");
     expect(pity?.body).toContain("Genshin");
-    expect(pity?.body).toContain("Star Rail");
-    expect(pity?.body).toContain("Wuthering Waves");
+    expect(pity?.body).toContain("Featured");
+  });
+
+  it("the timeline card covers game timeline import", () => {
+    const timeline = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "Timeline");
+    expect(timeline?.sketch).toBe("timelineImport");
+    expect(timeline?.body).toContain("LLM");
+    expect(timeline?.body).toMatch(/no AI call/i);
+  });
+
+  it("automatic backups are a separate card from manual export", () => {
+    const auto = featureSections.flatMap((s) => s.cards).find((c) => c.tag === "Automatic");
+    expect(auto?.sketch).toBe("autoBackup");
+    expect(auto?.body).toContain("weekly");
+  });
+
+  it("Live Activity is no longer claimed on the site", () => {
+    const tags = featureSections.flatMap((s) => s.cards).map((c) => c.tag);
+    expect(tags).not.toContain("Live Activity");
   });
 
   it("the App Lock entry draws Face ID rather than reserving a photo slot", () => {
@@ -51,6 +68,7 @@ describe("feature sections", () => {
     expect(appLock?.sketch).toBe("faceid");
   });
 });
+
 
 describe("content pages", () => {
   it("has one page per feature section, plus one closing page — no page carries more than one topic", () => {

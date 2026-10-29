@@ -1,0 +1,76 @@
+.sketch {
+  composes: shell from "./Sketch.module.css";
+}
+
+.caption {
+  composes: caption from "./Sketch.module.css";
+}
+
+.glyph {
+  width: 100%;
+  max-width: 176px;
+  aspect-ratio: 4 / 3;
+  overflow: visible;
+}
+
+.frame,
+.band,
+.arrow,
+.arrowHead,
+.file,
+.fold {
+  stroke: var(--ink-light);
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.band { opacity: .55; }
+
+.json {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--game);
+  text-anchor: middle;
+}
+
+.row {
+  fill: var(--game);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.row1 { animation: land-row 7s ease-in-out infinite; }
+.row2 { animation: land-row 7s ease-in-out infinite; animation-delay: .35s; fill: var(--mint); }
+.row3 { animation: land-row 7s ease-in-out infinite; animation-delay: .7s; fill: var(--coral); }
+
+.frame { animation: pulse-frame 7s ease-in-out infinite; }
+.file { animation: pulse-file 7s ease-in-out infinite; }
+
+@keyframes pulse-frame {
+  0%, 8% { opacity: .35; }
+  18%, 40% { opacity: 1; }
+  55%, 100% { opacity: .45; }
+}
+
+@keyframes pulse-file {
+  0%, 28% { opacity: .35; }
+  40%, 62% { opacity: 1; }
+  78%, 100% { opacity: .45; }
+}
+
+@keyframes land-row {
+  0%, 48% { opacity: 0; transform: translateY(6px); }
+  58% { opacity: 1; transform: translateY(0); }
+  82% { opacity: 1; transform: translateY(0); }
+  94%, 100% { opacity: 0; transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame, .file, .row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

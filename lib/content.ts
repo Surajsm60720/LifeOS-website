@@ -1,18 +1,17 @@
-// Cards through v1.0.2 are transcribed verbatim from that verified
-// index.html build. The pity-counter card was checked against the
-// LifeOS README at v1.0.3 ("What's new"). Do not add, reword, or expand
+// Feature cards are checked against the LifeOS README status table and
+// "What's new" sections through v1.0.5. Do not add, reword, or expand
 // any entry without re-checking that README (see the design spec, §0).
 
 /** Every card gets a hand-drawn accent in place of a photo — one Sketch* component per kind, dispatched in FeatureSection. */
 export type SketchKind =
   | "faceid"
-  | "dynamicIsland"
   | "heatGrid"
   | "mapPin"
   | "swipeRow"
   | "durationBar"
   | "pulseRow"
   | "pityRamp"
+  | "timelineImport"
   | "quietProgress"
   | "windowFill"
   | "loopMarker"
@@ -20,6 +19,7 @@ export type SketchKind =
   | "quotaRing"
   | "splitReceipt"
   | "fileArrow"
+  | "autoBackup"
   | "markdownLines"
   | "gitBranch"
   | "terminal"
@@ -43,7 +43,7 @@ export type FeatureSection = {
   cards: FeatureCard[];
 };
 /** Displayed LifeOS marketing version. The weekly sync may replace only this string. */
-export const appVersion = "1.0.3";
+export const appVersion = "1.0.5";
 export const heroEyebrow = `Version ${appVersion}`;
 export const heroLede =
   "A calendar that holds your real life, your game cadence, and everything you're part-way through reading — in one entry model, on one device, with no account behind it.";
@@ -76,10 +76,18 @@ export const featureSections: FeatureSection[] = [
         sketchCaption: "same time, every time —",
       },
       {
+        tag: "Timeline",
+        dotVar: "--game",
+        title: "A patch from a picture",
+        body: "Share a prompt, hand a livestream timeline to an LLM, import the JSON. Events, banners and endgame land as entries — no AI call from the app.",
+        sketch: "timelineImport",
+        sketchCaption: "image in, patch out —",
+      },
+      {
         tag: "Pity",
         dotVar: "--game",
         title: "The session, counted",
-        body: "A live wish count for Genshin, Star Rail and Wuthering Waves. It heats up as you close in on hard pity.",
+        body: "A live wish count for Genshin, Star Rail and Wuthering Waves. Cards heat toward hard pity; Featured versus off-banner drives the guarantee.",
         sketch: "pityRamp",
         sketchCaption: "still counting —",
       },
@@ -153,14 +161,6 @@ export const featureSections: FeatureSection[] = [
         sketch: "quotaRing",
         sketchCaption: "against the cap —",
       },
-      {
-        tag: "Live Activity",
-        dotVar: "--violet",
-        title: "Today, in the Dynamic Island",
-        body: "A count badge in the Island and up to three events on the Lock Screen, re-synced whenever you open the app.",
-        sketch: "dynamicIsland",
-        sketchCaption: "today, right there —",
-      },
     ],
   },
   {
@@ -198,10 +198,18 @@ export const featureSections: FeatureSection[] = [
         sketchCaption: "yours either way —",
       },
       {
+        tag: "Automatic",
+        dotVar: "--gold",
+        title: "A folder that keeps up",
+        body: "Pick a folder once for weekly restore points, plus monthly and yearly archives shaped for an LLM. Back Up Now never rotates a weekly away.",
+        sketch: "autoBackup",
+        sketchCaption: "on a schedule —",
+      },
+      {
         tag: "Recap",
         dotVar: "--gold",
         title: "Markdown built for summarising",
-        body: "A date-ranged export with pre-computed stats, written to be pasted into an LLM by hand — the app never calls one itself.",
+        body: "A date-ranged export with pre-computed stats, written to paste into an LLM by hand — the app never calls one itself.",
         sketch: "markdownLines",
         sketchCaption: "written for you —",
       },
@@ -209,7 +217,7 @@ export const featureSections: FeatureSection[] = [
         tag: "App Lock",
         dotVar: "--gold",
         title: "Face ID on return",
-        body: "Optional biometric or passcode lock that covers sheets too, plus a recovery mode that degrades gracefully instead of crash-looping if the store fails to open.",
+        body: "Optional Face ID or passcode lock that covers sheets too, with a recovery mode if the store fails to open.",
         sketch: "faceid",
         sketchCaption: "just your face —",
       },
@@ -255,13 +263,10 @@ export const closingSection: FeatureSection = {
   ],
 };
 
-// One notebook page per section — previously pages 2 and 3 each carried
-// two whole sections (7 and 5 cards) against page 1's 3, so the "book"
-// read as badly unbalanced. One-per-page gives 4/4/3/2/3 cards a page,
-// close enough to even that no page reads as the short one or the slog.
-// The closing page rides along as a sixth page in the same pagination —
-// there's no separate footer section any more, so nothing else needs to
-// know where the "book" actually ends.
+// One notebook page per section. Densities after v1.0.5: 5 / 4 / 2 / 2 / 4
+// cards a page — the denser first and last pages scroll inside the card
+// rather than spilling the notebook. The closing page rides along as a
+// sixth page in the same pagination.
 export type ContentPage = { label: string; sections: FeatureSection[] };
 
 export const contentPages: ContentPage[] = [

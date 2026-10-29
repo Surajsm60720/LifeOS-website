@@ -47,6 +47,27 @@
   opacity: .55;
 }
 
+.dense {
+  padding: clamp(1.35rem, 3.4vw, 2rem) clamp(1.6rem, 4.5vw, 2.85rem) clamp(1.15rem, 2.8vw, 1.6rem);
+}
+
+.crowded {
+  padding: clamp(1.2rem, 3vw, 1.7rem) clamp(1.4rem, 4vw, 2.4rem) clamp(1rem, 2.4vw, 1.35rem);
+}
+
+.sparse {
+  display: flex;
+  flex-direction: column;
+  min-height: min(78dvh, 640px);
+  padding: clamp(1.8rem, 4.2vw, 2.75rem) clamp(2rem, 5vw, 3.4rem) clamp(1.6rem, 3.4vw, 2.25rem);
+}
+
+.sparse .inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 @media (max-width: 880px) {
   .page { border-radius: 18px; }
 }

@@ -59,10 +59,64 @@
 }
 .link:hover { color: var(--coral); border-color: var(--coral); }
 
+/* 4-card pages — a light trim so the last row still fits, without
+   crushing the type the way the first pass did. */
+.dense .head { margin-bottom: .7rem; }
+.dense .head h2 { margin: .28rem 0 .32rem; font-size: clamp(1.12rem, 2.8vw, 1.42rem); }
+.dense .row { padding: .58rem 0; gap: clamp(.85rem, 2.4vw, 1.4rem); }
+.dense .text { gap: .24rem; }
+.dense .text p { font-size: .78rem; line-height: 1.42; }
+.dense :global(figure) { width: clamp(84px, 14vw, 128px); }
+
+/* 5-card first page — still tighter than dense, but readable. */
+.crowded .head { margin-bottom: .55rem; }
+.crowded .head h2 { margin: .22rem 0 .28rem; font-size: clamp(1.08rem, 2.6vw, 1.35rem); }
+.crowded .head p { font-size: .76rem; line-height: 1.38; }
+.crowded .row { padding: .48rem 0; gap: clamp(.75rem, 2vw, 1.2rem); }
+.crowded .text { gap: .2rem; }
+.crowded .text h3 { font-size: .98rem; }
+.crowded .text p { font-size: .74rem; line-height: 1.38; }
+.crowded :global(figure) { width: clamp(76px, 12vw, 112px); }
+.crowded :global(figcaption) { font-size: .76rem; }
+
+/* Closing page — three short cards; open the rhythm so the frame
+   doesn't read as half-empty. */
+.sparse {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.sparse .head { margin-bottom: 1.15rem; }
+.sparse .list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.sparse .row { padding: 1rem 0; gap: clamp(1.1rem, 3vw, 2rem); }
+.sparse .text { gap: .4rem; }
+.sparse .text h3 { font-size: 1.05rem; }
+.sparse .text p { font-size: .88rem; line-height: 1.5; }
+.sparse :global(figure) { width: clamp(110px, 18vw, 160px); }
+.sparse :global(figcaption) { font-size: .9rem; }
+
 @media (max-width: 720px) {
   .row,
   .row:nth-child(even) {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .dense :global(figure),
+  .crowded :global(figure) {
+    width: min(52%, 130px);
+  }
+
+  .sparse {
+    min-height: 0;
+  }
+  .sparse .list {
+    justify-content: flex-start;
   }
 }

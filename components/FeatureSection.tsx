@@ -1,13 +1,13 @@
 import styles from "./FeatureSection.module.css";
 import type { FeatureSection as FeatureSectionData } from "@/lib/content";
 import { SketchFaceID } from "./SketchFaceID";
-import { SketchDynamicIsland } from "./SketchDynamicIsland";
 import { SketchHeatGrid } from "./SketchHeatGrid";
 import { SketchMapPin } from "./SketchMapPin";
 import { SketchSwipeRow } from "./SketchSwipeRow";
 import { SketchDurationBar } from "./SketchDurationBar";
 import { SketchPulseRow } from "./SketchPulseRow";
 import { SketchPityRamp } from "./SketchPityRamp";
+import { SketchTimelineImport } from "./SketchTimelineImport";
 import { SketchQuietProgress } from "./SketchQuietProgress";
 import { SketchWindowFill } from "./SketchWindowFill";
 import { SketchLoopMarker } from "./SketchLoopMarker";
@@ -15,6 +15,7 @@ import { SketchBlockStack } from "./SketchBlockStack";
 import { SketchQuotaRing } from "./SketchQuotaRing";
 import { SketchSplitReceipt } from "./SketchSplitReceipt";
 import { SketchFileArrow } from "./SketchFileArrow";
+import { SketchAutoBackup } from "./SketchAutoBackup";
 import { SketchMarkdownLines } from "./SketchMarkdownLines";
 import { SketchGitBranch } from "./SketchGitBranch";
 import { SketchTerminal } from "./SketchTerminal";
@@ -25,8 +26,6 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
   switch (card.sketch) {
     case "faceid":
       return <SketchFaceID caption={card.sketchCaption} />;
-    case "dynamicIsland":
-      return <SketchDynamicIsland caption={card.sketchCaption} />;
     case "heatGrid":
       return <SketchHeatGrid caption={card.sketchCaption} />;
     case "mapPin":
@@ -39,6 +38,8 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
       return <SketchPulseRow caption={card.sketchCaption} />;
     case "pityRamp":
       return <SketchPityRamp caption={card.sketchCaption} />;
+    case "timelineImport":
+      return <SketchTimelineImport caption={card.sketchCaption} />;
     case "quietProgress":
       return <SketchQuietProgress caption={card.sketchCaption} />;
     case "windowFill":
@@ -53,6 +54,8 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
       return <SketchSplitReceipt caption={card.sketchCaption} />;
     case "fileArrow":
       return <SketchFileArrow caption={card.sketchCaption} />;
+    case "autoBackup":
+      return <SketchAutoBackup caption={card.sketchCaption} />;
     case "markdownLines":
       return <SketchMarkdownLines caption={card.sketchCaption} />;
     case "gitBranch":
@@ -64,9 +67,34 @@ function cardMedia(card: FeatureSectionData["cards"][number]) {
   }
 }
 
+function densityClass(cardCount: number): string {
+  if (cardCount >= 5) return styles.crowded;
+  if (cardCount >= 4) return styles.dense;
+  // Closing page: three short cards leave a hollow frame unless we open the rhythm.
+  if (cardCount === 3) return styles.sparse;
+  return "";
+}
+
+function densityName(cardCount: number): "crowded" | "dense" | "sparse" | undefined {
+  if (cardCount >= 5) return "crowded";
+  if (cardCount >= 4) return "dense";
+  if (cardCount === 3) return "sparse";
+  return undefined;
+}
+
 export function FeatureSection({ section }: { section: FeatureSectionData }) {
+  // Notebook wheel events turn pages rather than scrolling the card, so
+  // density is how dense and sparse pages stay balanced inside one frame.
+  const count = section.cards.length;
+  const density = densityClass(count);
+
   return (
-    <section className={styles.section} id={section.id} tabIndex={section.id ? -1 : undefined}>
+    <section
+      className={`${styles.section} ${density}`}
+      id={section.id}
+      tabIndex={section.id ? -1 : undefined}
+      data-density={densityName(count)}
+    >
       <div className={styles.head}>
         <p className="eyebrow">{section.eyebrow}</p>
         <h2>{section.heading}</h2>
